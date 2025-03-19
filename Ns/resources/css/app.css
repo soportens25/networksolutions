@@ -1,0 +1,92 @@
+/* resources/css/app.css */
+
+/* Sidebar */
+#sidebar {
+    height: 100vh; /* Alto completo */
+    width: 250px;
+    background-color: #ff6600; /* Naranja brillante */
+    padding-top: 30px;
+    border-radius: 0 10px 10px 0;
+    box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Encabezado del Sidebar */
+#sidebar h4 {
+    color: white;
+    font-size: 1.7rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Estilo de los enlaces en el Sidebar */
+.nav-item {
+    margin-bottom: 15px;
+}
+
+.nav-link {
+    color: white;
+    font-size: 1.1rem;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+/* Hover en los enlaces */
+.nav-link:hover {
+    background-color: #ff8533;
+    transform: translateX(5px);
+    color: white;
+}
+
+/* Estilo del Dropdown */
+.dropdown-toggle {
+    color: white !important;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.dropdown-toggle:hover {
+    background-color: #ff8533;
+    transform: translateX(5px);
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+    background-color: #ff6600;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-item {
+    font-size: 1rem;
+    padding: 8px 12px;
+    color: white;
+}
+
+.dropdown-item:hover {
+    background-color: #ff8533;
+    color: white;
+}
+
+/* Main content area */
+.content-wrapper {
+    background-color: #f8f9fa;
+    padding: 20px;
+    margin-left: 250px; /* Deja espacio para el sidebar */
+    transition: margin-left 0.3s;
+}
+
+/* Responsividad: Ocultar Sidebar en pantallas pequeñas */
+@media (max-width: 768px) {
+    #sidebar {
+        display: none;
+    }
+    .content-wrapper {
+        margin-left: 0;
+    }
+}
