@@ -47,6 +47,12 @@
                             <span>Tienda</span>
                         </a>
                     </li>
+                    <a href="#"
+                            class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                            data-target="usuarios">
+                            <i class="ri-store-2-line text-xl"></i>
+                            <span>Usuarios</span>
+                        </a>
                     <li>
                         <a href="#"
                             class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
