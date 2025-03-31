@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Hash, Storage, Log};
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
-use App\Models\{User, Categoria, Producto, Servicio, Factura, Estado, Empresa, Inventario, Historial_mantenimiento, Personal_encargado};
+use App\Models\{User, Categoria, Producto, Servicio, Factura, Estado, Empresa, Inventario, Historial_mantenimiento, Personal_encargado, Role};
 use App\Exports\InventarioExport;
 
 class DashboardController extends Controller
@@ -14,7 +14,7 @@ class DashboardController extends Controller
     public function index()
     {
         return view('dashboard', [
-            'users' => User::all(),
+            'users' => User::with(['empresas', 'roles'])->get(),
             'categorias' => Categoria::all(),
             'productos' => Producto::all(),
             'servicios' => Servicio::all(),
@@ -24,6 +24,7 @@ class DashboardController extends Controller
             'inventarios' => Inventario::all(),
             'historial_mantenimiento' => Historial_mantenimiento::all(),
             'personal_encargado' => Personal_encargado::all(),
+            'roles' => Role::all()
         ]);
     }
 
@@ -37,9 +38,29 @@ class DashboardController extends Controller
 
             $validatedData = $this->validateData($request, $section);
 
-            // Manejar la subida de imágenes si hay un logo o imágenes
-            $validatedData = $this->handleImages($request, $validatedData, $section);
+            // Si estamos creando un usuario, manejamos la asignación de empresa y rol
+            if ($section === 'usuarios') {
+                $empresaId = $request->input('empresa');
+                $rolName = $request->input('rol');
 
+                // Validar que la empresa y el rol existen
+                $empresa = Empresa::findOrFail($empresaId);
+                $rol = \Spatie\Permission\Models\Role::where('name', $rolName)->firstOrFail();
+
+                // Crear el usuario
+                $user = new User($validatedData);
+                $user->save();
+
+                // Asignar el rol globalmente con Spatie
+                $user->assignRole($rolName);
+
+                // Asociar la empresa con el usuario y asignar el rol en la tabla pivot
+                $user->empresas()->attach($empresaId, ['role_id' => $rol->id]);
+
+                return redirect()->route('dashboard')->with('success', 'Usuario creado y asignado a la empresa correctamente.');
+            }
+
+            // Para otras secciones, crear el modelo normalmente
             $newItem = new $model($validatedData);
             $newItem->save();
 
@@ -105,19 +126,19 @@ class DashboardController extends Controller
         if ($section !== 'inventarios') {
             return redirect()->route('dashboard')->with('error', 'PDF no disponible para esta sección.');
         }
-    
+
         $inventario = Inventario::with('empresa')->findOrFail($id);
-    
+
         if (!$inventario->empresa) {
             return redirect()->route('dashboard')->with('error', 'No se encontró la empresa asociada.');
         }
-    
+
         $empresa = $inventario->empresa;
         $logo = $empresa->logo ?? 'default-logo.png';
-    
+
         $pdf = PDF::loadView('inventario.pdf', compact('inventario', 'empresa', 'logo'));
         return $pdf->download('Hoja_de_vida_Equipo-' . $inventario->id . '.pdf');
-    }    
+    }
 
     private function getModel($section)
     {
@@ -231,12 +252,11 @@ class DashboardController extends Controller
             if ($request->hasFile($field)) {
                 // Guardar la imagen en storage/app/public/imagenes/$section
                 $path = $request->file($field)->store("imagenes/$section", 'public');
-    
+
                 // Guardar solo la ruta relativa en la base de datos
                 $validatedData[$field] = $path;
             }
         }
         return $validatedData;
     }
-    
 }

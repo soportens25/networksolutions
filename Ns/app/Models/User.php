@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;  
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
@@ -43,4 +43,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    // En User.php
+    public function empresas()
+    {
+        return $this->belongsToMany(Empresa::class)->withPivot('role_id')->withTimestamps();
+    }
+    public function users()
+    {
+        return $this->belongsToMany(User::class)->withPivot('role_id')->withTimestamps();
+    }
+    
 }
