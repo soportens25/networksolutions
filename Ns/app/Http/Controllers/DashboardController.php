@@ -13,20 +13,50 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('dashboard', [
-            'users' => User::with(['empresas', 'roles'])->get(),
-            'categorias' => Categoria::all(),
-            'productos' => Producto::all(),
-            'servicios' => Servicio::all(),
-            'facturas' => Factura::all(),
-            'estados' => Estado::all(),
-            'empresas' => Empresa::all(),
-            'inventarios' => Inventario::all(),
-            'historial_mantenimiento' => Historial_mantenimiento::all(),
-            'personal_encargado' => Personal_encargado::all(),
-            'roles' => Role::all()
-        ]);
-    }
+        $user = auth()->user();
+    
+        // Roles con acceso total
+        $rolesConAccesoTotal = ['admin', 'tecnico'];
+    
+        // ¿Tiene acceso total?
+        $tieneAccesoTotal = $user->hasAnyRole($rolesConAccesoTotal);
+    
+        if ($tieneAccesoTotal) {
+            // Admin y técnico ven todo
+            return view('dashboard', [
+                'users' => User::with(['empresas', 'roles'])->get(),
+                'categorias' => Categoria::all(),
+                'productos' => Producto::all(),
+                'servicios' => Servicio::all(),
+                'facturas' => Factura::all(),
+                'estados' => Estado::all(),
+                'empresas' => Empresa::all(),
+                'inventarios' => Inventario::all(),
+                'historial_mantenimiento' => Historial_mantenimiento::all(),
+                'personal_encargado' => Personal_encargado::all(),
+                'roles' => Role::all()
+            ]);
+        } else {
+            // Usuario empresarial: solo accede a sus empresas
+            $empresaIds = $user->empresas()->pluck('empresas.id')->toArray();
+    
+            return view('dashboard', [
+                'users' => User::with(['empresas', 'roles'])
+                    ->whereHas('empresas', function ($q) use ($empresaIds) {
+                        $q->whereIn('empresas.id', $empresaIds);    
+                    })->get(),
+    
+                'empresas' => Empresa::whereIn('id', $empresaIds)->get(),
+                'inventarios' => Inventario::whereIn('id_empresa', $empresaIds)->get(),
+    
+                'historial_mantenimiento' => Historial_mantenimiento::all(),
+    
+                'personal_encargado' => Personal_encargado::all(),  
+    
+                'roles' => Role::all() // o limitar si lo necesitás
+            ]);
+        }
+    }    
 
     public function store(Request $request, $section)
     {
@@ -115,11 +145,21 @@ class DashboardController extends Controller
     public function exportExcel($section)
     {
         if ($section === 'inventarios') {
-            return Excel::download(new InventarioExport, 'inventario.xlsx');
+            $user = auth()->user();
+            $rolesConAccesoTotal = ['admin', 'tecnico'];
+    
+            // Si el usuario es admin o técnico, exporta todo
+            if ($user->hasAnyRole($rolesConAccesoTotal)) {
+                return Excel::download(new InventarioExport(), 'inventario.xlsx');
+            }
+    
+            // Si no, exporta solo su inventario
+            $empresaIds = $user->empresas()->pluck('empresas.id')->toArray();
+            return Excel::download(new InventarioExport($empresaIds), 'inventario_empresa.xlsx');
         }
-
+    
         return redirect()->route('dashboard')->with('error', 'Exportación no disponible para esta sección.');
-    }
+    }    
 
     public function exportPdf($section, $id)
     {

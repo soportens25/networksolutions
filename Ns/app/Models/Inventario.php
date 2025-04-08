@@ -47,8 +47,9 @@ class Inventario extends Model
 
     public function empresa()
     {
-        return $this->belongsTo(Empresa::class, 'id_empresa');
+        return $this->belongsTo(Empresa::class, 'empresa_id'); // o 'empresa_id' según sea tu caso
     }
+    
     public function historialMantenimiento()
     {
         return $this->hasMany(Historial_mantenimiento::class, 'id_equipo');

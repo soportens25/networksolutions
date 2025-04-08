@@ -74,7 +74,11 @@
 
     <header class="fixed top-0 left-0 w-full z-40 bg-black/70 backdrop-blur-sm text-white py-3 shadow-md">
         <div class="container d-flex justify-content-between align-items-center">
-            <h1 class="text-2xl font-bold">Network Solutions <p class="text-sm text-gray-400 font-normal"> <i class="ri-calendar-check-line"></i> Horarios de atencion: 7:00 AM a 6:00PM</p> <a href="tel:3182927165" class="text-sm text-gray-400 font-normal"><i class="ri-phone-line"></i> Contacto: 318 292 7165 - </a> <a href="tel:3204563641" class="text-sm text-gray-400 font-normal"><i class="ri-whatsapp-line"></i> Contacto: 320 456 3641</a> </h1>
+            <h1 class="text-2xl font-bold">Network Solutions <p class="text-sm text-gray-400 font-normal"> <i
+                        class="ri-calendar-check-line"></i> Horarios de atencion: 7:00 AM a 6:00PM</p> <a
+                    href="tel:3182927165" class="text-sm text-gray-400 font-normal"><i class="ri-phone-line"></i>
+                    Contacto: 318 292 7165 - </a> <a href="tel:3204563641" class="text-sm text-gray-400 font-normal"><i
+                        class="ri-whatsapp-line"></i> Contacto: 320 456 3641</a> </h1>
             @if (auth()->check())
                 <div class="user-profile d-flex align-items-center">
                     <div class="px-2">
@@ -90,13 +94,22 @@
                                 type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ auth()->user()->name }}
                             </button>
-                            <ul style="background-color: gray; color: #bfc0c2;" class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item text-stone-300" href="{% url 'perfil_usuario' %}">Ver perfil</a></li>
-                                @if (auth()->check() && auth()->user()->hasRole('admin'))
+                            <ul style="background-color: gray; color: #bfc0c2;" class="dropdown-menu"
+                                aria-labelledby="dropdownMenuButton1">
+                                <li><a class="dropdown-item text-stone-300" href="{% url 'perfil_usuario' %}">Ver
+                                        perfil</a></li>
+                                @if (auth()->check() && auth()->user()->hasRole('admin|empresarial'))
                                     <li>
-                                        <a href="{{ route('dashboard') }}" class="dropdown-item text-stone-300">Panel de control</a>
+                                        <a href="{{ route('dashboard') }}" class="dropdown-item text-stone-300">Panel de
+                                            control</a>
                                     </li>
                                 @endif
+                                @if (auth()->check() && auth()->user()->hasRole('admin|empresarial|tecnico'))
+                                    <li>
+                                        <a href="{{ route('tickets.index') }}" class="dropdown-item text-stone-300">Help Desk</a>
+                                    </li>
+                                @endif
+
                                 <li>
                                     <form style="margin-left:16px;" method="POST" action="{{ route('logout') }}">
                                         @csrf

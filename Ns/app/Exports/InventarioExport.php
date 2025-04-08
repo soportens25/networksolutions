@@ -9,16 +9,27 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class InventarioExport implements FromQuery, WithHeadings, WithMapping
 {
+    protected $empresaIds;
+
+    public function __construct($empresaIds = null)
+    {
+        $this->empresaIds = $empresaIds;
+    }
+
     public function query()
     {
-        return Inventario::query();
+        $query = Inventario::query();
+
+        if ($this->empresaIds) {
+            $query->whereIn('id_empresa', $this->empresaIds);
+        }
+
+        return $query;
     }
 
     public function headings(): array
     {
         return [
-            'ID',
-            'ID Empresa',
             'Nombre Equipo',
             'Marca Equipo',
             'Tipo Equipo',
@@ -49,8 +60,6 @@ class InventarioExport implements FromQuery, WithHeadings, WithMapping
     public function map($inventario): array
     {
         return [
-            $inventario->id,
-            $inventario->id_empresa,
             $inventario->nombre_equipo,
             $inventario->marca_equipo,
             $inventario->tipo_equipo,

@@ -1,4 +1,3 @@
-
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold">📋 Lista de Empresas</h2>
@@ -20,6 +19,7 @@
                 </tr>
             </thead>
             <tbody>
+                @if(isset($empresas))
                 @foreach ($empresas as $empresa)
                 <tr>
                     <td>{{ $empresa->id }}</td>
@@ -27,9 +27,9 @@
                     <td>{{ $empresa->nit }}</td>
                     <td>
                         @if($empresa->logo)
-                            <img src="{{ asset('storage/' . $empresa->logo) }}" alt="Logo" width="100" height="100">
+                        <img src="{{ asset('storage/' . $empresa->logo) }}" alt="Logo" width="100" height="100">
                         @else
-                            <span class="badge bg-secondary">Sin logo</span>
+                        <span class="badge bg-secondary">Sin logo</span>
                         @endif
                     </td>
                     <td class="text-center">
@@ -46,6 +46,9 @@
                     </td>
                 </tr>
                 @endforeach
+                @else
+                <p>No hay empresas disponibles</p>
+                @endif
             </tbody>
         </table>
     </div>

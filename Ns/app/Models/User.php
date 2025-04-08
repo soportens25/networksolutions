@@ -52,5 +52,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class)->withPivot('role_id')->withTimestamps();
     }
+    public function messages() {
+        return $this->hasMany(Message::class);
+    }
+    
     
 }

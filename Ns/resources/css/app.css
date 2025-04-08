@@ -1,4 +1,7 @@
 /* resources/css/app.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Sidebar */
 #sidebar {

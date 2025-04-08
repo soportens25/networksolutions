@@ -9,7 +9,6 @@
 </div>
 
 <!-- Tabla de usuarios -->
-<!-- Tabla de usuarios -->
 <table class="table-auto w-full bg-white shadow-md rounded-lg">
     <thead>
         <tr class="bg-gray-200 text-gray-700">
@@ -22,51 +21,55 @@
         </tr>
     </thead>
     <tbody>
+        @if(isset($users))
         @foreach ($users as $user)
-            <tr class="border-b hover:bg-gray-100 transition">
-                <td class="p-3">{{ $user->id }}</td>
-                <td class="p-3">{{ $user->name }}</td>
-                <td class="p-3">{{ $user->email }}</td>
+        <tr class="border-b hover:bg-gray-100 transition">
+            <td class="p-3">{{ $user->id }}</td>
+            <td class="p-3">{{ $user->name }}</td>
+            <td class="p-3">{{ $user->email }}</td>
 
-                <!-- Empresas con estilos -->
-                <td class="p-3">
-                    @if ($user->empresas->isNotEmpty())
-                        @foreach ($user->empresas as $empresa)
-                            <span class="px-2 py-1 text-sm font-semibold text-blue-700 bg-blue-200 rounded-lg">
-                                {{ $empresa->nombre_empresa }}
-                            </span>
-                        @endforeach
-                    @else
-                        <span class="px-2 py-1 text-sm text-gray-600 bg-gray-300 rounded-lg">Sin empresa</span>
-                    @endif
-                </td>
+            <!-- Empresas con estilos -->
+            <td class="p-3">
+                @if ($user->empresas->isNotEmpty())
+                @foreach ($user->empresas as $empresa)
+                <span class="px-2 py-1 text-sm font-semibold text-blue-700 bg-blue-200 rounded-lg">
+                    {{ $empresa->nombre_empresa }}
+                </span>
+                @endforeach
+                @else
+                <span class="px-2 py-1 text-sm text-gray-600 bg-gray-300 rounded-lg">Sin empresa</span>
+                @endif
+            </td>
 
-                <!-- Roles con estilos -->
-                <td class="p-3">
-                    @if ($user->roles->isNotEmpty())
-                        @foreach ($user->roles as $rol)
-                            <span class="px-2 py-1 text-sm font-semibold text-white 
+            <!-- Roles con estilos -->
+            <td class="p-3">
+                @if ($user->roles->isNotEmpty())
+                @foreach ($user->roles as $rol)
+                <span class="px-2 py-1 text-sm font-semibold text-white 
                                 {{ $rol->name == 'Admin' ? 'bg-red-500' : 
                                     ($rol->name == 'Técnico' ? 'bg-green-500' : 'bg-gray-500') }} 
                                 rounded-lg">
-                                {{ $rol->name }}
-                            </span>
-                        @endforeach
-                    @else
-                        <span class="px-2 py-1 text-sm text-gray-600 bg-gray-300 rounded-lg">Sin rol</span>
-                    @endif
-                </td>
+                    {{ $rol->name }}
+                </span>
+                @endforeach
+                @else
+                <span class="px-2 py-1 text-sm text-gray-600 bg-gray-300 rounded-lg">Sin rol</span>
+                @endif
+            </td>
 
-                <td class="p-3 flex space-x-2">
-                    <button class="btn btn-warning">Editar</button>
-                    <form action="{{ route('dashboard.destroy', ['section' => 'usuarios', 'id' => $user->id]) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
+            <td class="p-3 flex space-x-2">
+                <button class="btn btn-warning">Editar</button>
+                <form action="{{ route('dashboard.destroy', ['section' => 'usuarios', 'id' => $user->id]) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </td>
+        </tr>
         @endforeach
+        @else
+        <p>No hay usuarios disponibles</p>
+        @endif
     </tbody>
 </table>
 
@@ -102,9 +105,13 @@
                         <label for="empresa" class="form-label">Empresa</label>
                         <select name="empresa" id="empresa" class="form-control" required>
                             <option value="">Selecciona una empresa</option>
+                            @if(isset($empresas))
                             @foreach ($empresas as $empresa)
-                                <option value="{{ $empresa->id }}">{{ $empresa->nombre_empresa }}</option>
+                            <option value="{{ $empresa->id }}">{{ $empresa->nombre_empresa }}</option>
                             @endforeach
+                            @else
+                            <p>No hay empresas disponibles</p>
+                            @endif
                         </select>
                     </div>
                     <!-- Campo para seleccionar Rol -->
@@ -112,9 +119,13 @@
                         <label for="rol" class="form-label">Rol</label>
                         <select name="rol" id="rol" class="form-control" required>
                             <option value="">Selecciona un rol</option>
+                            @if(isset($roles))
                             @foreach ($roles as $rol)
-                                <option value="{{ $rol->name }}">{{ $rol->name }}</option>
+                            <option value="{{ $rol->name }}">{{ $rol->name }}</option>
                             @endforeach
+                            @else
+                            <p>No hay roles disponibles</p>
+                            @endif
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Agregar Usuario</button>

@@ -23,33 +23,37 @@
         </tr>
     </thead>
     <tbody>
+    @if(isset($servicios))
         @foreach ($servicios as $servicio)
-            <tr class="border-b">
-                <td class="p-3">{{ $servicio->id }}</td>
-                <td class="p-3">{{ $servicio->servicio }}</td>
-                <td class="p-3">{{ $servicio->tipo }}</td>
-                <td class="p-3">{{ $servicio->especificacion }}</td>
-                <td class="p-3">
-                    <img src="{{ asset('storage/' . $servicio->imagen) }}" alt="Imagen del servicio" class="w-20 h-20 object-cover">
-                </td>
-                <td>
-                    <img src="{{ asset('storage/' . $servicio->imagen1) }}" alt="Imagen del servicio" class="w-20 h-20 object-cover">
-                </td>
-                <td>
-                    <img src="{{ asset('storage/' . $servicio->imagen2) }}" alt="Imagen del servicio" class="w-20 h-20 object-cover">
-                </td>
-                <td>
-                    <img src="{{ asset('storage/' . $servicio->imagen3) }}" alt="Imagen del servicio" class="w-20 h-20 object-cover">
-                </td>
-                <td class="p-3">
-                    <form action="{{ route('dashboard.destroy', ['section' => 'servicios', 'id' => $servicio->id]) }}" method="POST" onsubmit="return confirm('¿Eliminar servicio?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
+        <tr class="border-b">
+            <td class="p-3">{{ $servicio->id }}</td>
+            <td class="p-3">{{ $servicio->servicio }}</td>
+            <td class="p-3">{{ $servicio->tipo }}</td>
+            <td class="p-3">{{ $servicio->especificacion }}</td>
+            <td class="p-3">
+                <img src="{{ asset('storage/' . $servicio->imagen) }}" alt="Imagen del servicio" class="w-20 h-20 object-cover">
+            </td>
+            <td>
+                <img src="{{ asset('storage/' . $servicio->imagen1) }}" alt="Imagen del servicio" class="w-20 h-20 object-cover">
+            </td>
+            <td>
+                <img src="{{ asset('storage/' . $servicio->imagen2) }}" alt="Imagen del servicio" class="w-20 h-20 object-cover">
+            </td>
+            <td>
+                <img src="{{ asset('storage/' . $servicio->imagen3) }}" alt="Imagen del servicio" class="w-20 h-20 object-cover">
+            </td>
+            <td class="p-3">
+                <form action="{{ route('dashboard.destroy', ['section' => 'servicios', 'id' => $servicio->id]) }}" method="POST" onsubmit="return confirm('¿Eliminar servicio?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Eliminar</button>
+                </form>
+            </td>
+        </tr>
         @endforeach
+        @else
+        <p>No hay servicios disponibles</p>
+        @endif
     </tbody>
 </table>
 

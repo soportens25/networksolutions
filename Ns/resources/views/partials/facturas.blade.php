@@ -25,27 +25,31 @@
         </tr>
     </thead>
     <tbody>
+    @if(isset($facturas))
         @foreach ($facturas as $factura)
-            <tr class="border-b">
-                <td class="p-3">{{ $factura->id }}</td>
-                <td class="p-3">{{ $factura->nombre_cliente }}</td>
-                <td class="p-3">{{ $factura->direccion_cliente }}</td>
-                <td class="p-3">{{ $factura->documento_cliente }}</td>
-                <td class="p-3">{{ $factura->telefono_cliente }}</td>
-                <td class="p-3">{{ $factura->correo_cliente }}</td>
-                <td class="p-3">{{ $factura->fecha_emision }}</td>
-                <td class="p-3">{{ $factura->subtotal }}</td>
-                <td class="p-3">{{ $factura->total }}</td>
-                <td class="p-3">{{ $factura->metodo_pago }}</td>
-                <td class="p-3">
-                    <form action="{{ route('dashboard.destroy', ['section' => 'facturas', 'id' => $factura->id]) }}" method="POST" onsubmit="return confirm('¿Eliminar factura?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
+        <tr class="border-b">
+            <td class="p-3">{{ $factura->id }}</td>
+            <td class="p-3">{{ $factura->nombre_cliente }}</td>
+            <td class="p-3">{{ $factura->direccion_cliente }}</td>
+            <td class="p-3">{{ $factura->documento_cliente }}</td>
+            <td class="p-3">{{ $factura->telefono_cliente }}</td>
+            <td class="p-3">{{ $factura->correo_cliente }}</td>
+            <td class="p-3">{{ $factura->fecha_emision }}</td>
+            <td class="p-3">{{ $factura->subtotal }}</td>
+            <td class="p-3">{{ $factura->total }}</td>
+            <td class="p-3">{{ $factura->metodo_pago }}</td>
+            <td class="p-3">
+                <form action="{{ route('dashboard.destroy', ['section' => 'facturas', 'id' => $factura->id]) }}" method="POST" onsubmit="return confirm('¿Eliminar factura?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Eliminar</button>
+                </form>
+            </td>
+        </tr>
         @endforeach
+        @else
+        <p>No hay facturas disponibles</p>
+        @endif
     </tbody>
 </table>
 

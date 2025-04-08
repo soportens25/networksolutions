@@ -20,23 +20,27 @@
             </tr>
         </thead>
         <tbody>
+            @if(isset($categorias))
             @foreach ($categorias as $categoria)
-                <tr class="border-b">
-                    <td class="p-3">{{ $categoria->id }}</td>
-                    <td class="p-3">{{ $categoria->categoria }}</td>
-                    <td class="p-3">{{ $categoria->explicacion }}</td>
-                    <td class="p-3"><img src="{{ asset('storage/' . $categoria->imagen) }}" alt="Imagen de la categoría"
-                            class="w-20 h-20 object-cover">
-                    <td class="p-3">
-                        <form action="{{ route('dashboard.destroy', ['section' => 'categorias', 'id' => $categoria->id]) }}"
-                            method="POST" onsubmit="return confirm('¿Eliminar categoría?');">
-                            @csrf @method('DELETE')
-                            <button type="submit"
-                                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
+            <tr class="border-b">
+                <td class="p-3">{{ $categoria->id }}</td>
+                <td class="p-3">{{ $categoria->categoria }}</td>
+                <td class="p-3">{{ $categoria->explicacion }}</td>
+                <td class="p-3"><img src="{{ asset('storage/' . $categoria->imagen) }}" alt="Imagen de la categoría"
+                        class="w-20 h-20 object-cover">
+                <td class="p-3">
+                    <form action="{{ route('dashboard.destroy', ['section' => 'categorias', 'id' => $categoria->id]) }}"
+                        method="POST" onsubmit="return confirm('¿Eliminar categoría?');">
+                        @csrf @method('DELETE')
+                        <button type="submit"
+                            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
             @endforeach
+            @else
+            <p>No hay categorías disponibles</p>
+            @endif
         </tbody>
     </table>
 

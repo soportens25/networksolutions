@@ -2,9 +2,12 @@
     <h2 class="mb-4 text-primary fw-bold">📋 Inventario de Equipos</h2>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <button class="btn btn-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addModal">
-            <i class="ri-add-line me-2"></i> Agregar Equipo
-        </button>
+        @role('admin|tecnico')
+            <button class="btn btn-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addModal">
+                <i class="ri-add-line me-2"></i> Agregar Equipo
+            </button>
+        @endrole
+
         <a href="{{ route('dashboard.exportExcel', ['section' => 'inventarios']) }}"
             class="btn btn-primary d-flex align-items-center">
             <i class="ri-file-excel-2-line me-2"></i> Exportar Excel
@@ -15,7 +18,7 @@
         <table class="table table-hover text-center align-middle">
             <thead class="table-dark">
                 <tr>
-                    <th>ID</th>
+                    <th class="hidden">ID</th>
                     <th>Nombre</th>
                     <th>Sticker</th>
                     <th>Marca</th>
@@ -24,13 +27,15 @@
                     <th>Serial</th>
                     <th>Empresa</th>
                     <th>Acciones</th>
+                    @role('admin|tecnico')
                     <th>Adicional</th>
+                    @endrole
                 </tr>
             </thead>
             <tbody class="table-light">
                 @foreach ($inventarios as $item)
                     <tr>
-                        <td class="fw-bold">{{ $item->id }}</td>
+                        <td class="fw-bold hidden">{{ $item->id }}</td>
                         <td>{{ $item->nombre_equipo }}</td>
                         <td>{{ $item->sticker }}</td>
                         <td>{{ $item->marca_equipo }}</td>
@@ -43,6 +48,7 @@
                                 class="btn btn-secondary btn-sm mb-2">
                                 <i class="ri-file-pdf-2-line"></i> PDF
                             </a>
+                            @role('admin|tecnico')
                             <form
                                 action="{{ route('dashboard.destroy', ['section' => 'inventarios', 'id' => $item->id]) }}"
                                 method="POST" class="d-inline">
@@ -53,7 +59,9 @@
                                     <i class="ri-delete-bin-6-line"></i> Eliminar
                                 </button>
                             </form>
+                            @endrole
                         </td>
+                        @role('admin|tecnico')
                         <td>
                             <!-- Botón para abrir el modal de Historial de Mantenimiento -->
                             <button type="button" class="btn btn-primary btn-sm mb-2" data-bs-toggle="modal"
@@ -67,6 +75,7 @@
                                 <i class="ri-user-add-line"></i> Encargado
                             </button>
                         </td>
+                        @endrole
                     </tr>
 
                     <!-- Modal para Historial de Mantenimiento -->
