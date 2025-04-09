@@ -14,37 +14,40 @@ class TicketController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $query = Ticket::with('assignedUser');
-
+        $query = Ticket::with('assignedUser', 'user'); // Asegúrate de incluir 'user' para el filtro por empresa
+    
         if ($user->hasRole('tecnico')) {
             // Técnicos ven los suyos y los no asignados
             $query->where(function ($q) use ($user) {
                 $q->whereNull('technician_id')
                     ->orWhere('technician_id', $user->id);
             });
-        } elseif (!$user->hasAnyRole(['admin'])) {
-            // Usuarios empresariales solo ven los tickets de su(s) empresa(s)
+        } elseif ($user->hasRole('empresarial')) {
+            // Usuarios empresariales solo ven tickets de su(s) empresa(s)
             $empresaIds = $user->empresas()->pluck('empresas.id')->toArray();
-
-            $query->whereIn('empresa_id', $empresaIds);
+    
+            $query->whereHas('user.empresas', function ($q) use ($empresaIds) {
+                $q->whereIn('empresas.id', $empresaIds);
+            });
         }
-
+        
         // Filtros opcionales
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
-
+    
         if ($request->filled('technician_id')) {
             $query->where('technician_id', $request->technician_id);
         }
-
+    
         $tickets = $query->paginate(10);
         $technicians = User::role('tecnico')->get();
         $currentStatus = TechnicianStatus::where('user_id', $user->id)->first();
-
+    
         return view('tickets.index', compact('tickets', 'technicians', 'currentStatus'));
     }
-
+    
+    
 
     public function store(Request $request)
     {

@@ -9,9 +9,9 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
 </head>
 
-<body class="bg-gradient-to-br from-indigo-50 via-white to-indigo-100 min-h-screen py-10">
+<body class="bg-gradient-to-br from-indigo-50 via-white to-indigo-100 min-h-screen py-10 mx-4 md:mx-20 mb-6">
 
-    <div class="bg-indigo-600 text-white py-4 px-6 shadow-md rounded mx-4 md:mx-20 mb-6">
+    <div class="bg-indigo-600 text-white py-4 px-6 shadow-md rounded ">
         <h1 class="text-xl font-bold flex items-center gap-2">
             <i class="ri-ticket-2-line text-2xl"></i>
             Listado de Tickets
