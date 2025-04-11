@@ -96,7 +96,7 @@
                             </button>
                             <ul style="background-color: gray; color: #bfc0c2;" class="dropdown-menu"
                                 aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item text-stone-300" href="{% url 'perfil_usuario' %}">Ver
+                                <li><a class="dropdown-item text-stone-300" href="{{ route('profile.update') }}">Ver
                                         perfil</a></li>
                                 @if (auth()->check() && auth()->user()->hasRole('admin|empresarial'))
                                     <li>
@@ -106,7 +106,8 @@
                                 @endif
                                 @if (auth()->check() && auth()->user()->hasRole('admin|empresarial|tecnico'))
                                     <li>
-                                        <a href="{{ route('tickets.index') }}" class="dropdown-item text-stone-300">Help Desk</a>
+                                        <a href="{{ route('tickets.index') }}" class="dropdown-item text-stone-300">Help
+                                            Desk</a>
                                     </li>
                                 @endif
 
@@ -278,9 +279,8 @@
             </div>
         </div>
     </section>
-
     <!-- WhatsApp Bubble -->
-    <a href="https://wa.me/573204563641?text=¡Hola!, quisiera saber más" target="_blank" class="whatsapp-bubble">
+    <a href="https://wa.me/+573114020692?text=¡Hola!, quisiera saber más" target="_blank" class="whatsapp-bubble">
         <i class="bi bi-whatsapp whatsapp-icon text-white text-2xl"></i>
     </a>
 
