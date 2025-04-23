@@ -68,32 +68,28 @@ class DashboardController extends Controller
 
             $validatedData = $this->validateData($request, $section);
 
-            // Si estamos creando un usuario, manejamos la asignación de empresa y rol
             if ($section === 'usuarios') {
                 $empresaId = $request->input('empresa');
                 $rolName = $request->input('rol');
-
-                // Validar que la empresa y el rol existen
+    
                 $empresa = Empresa::findOrFail($empresaId);
                 $rol = \Spatie\Permission\Models\Role::where('name', $rolName)->firstOrFail();
-
-                // Crear el usuario
+    
                 $user = new User($validatedData);
                 $user->save();
-
-                // Asignar el rol globalmente con Spatie
+    
                 $user->assignRole($rolName);
-
-                // Asociar la empresa con el usuario y asignar el rol en la tabla pivot
                 $user->empresas()->attach($empresaId, ['role_id' => $rol->id]);
-
+    
                 return redirect()->route('dashboard')->with('success', 'Usuario creado y asignado a la empresa correctamente.');
             }
-
-            // Para otras secciones, crear el modelo normalmente
+    
+            // 👉 Procesar imágenes para secciones que no son "usuarios"
+            $validatedData = $this->handleImages($request, $validatedData, $section);
+    
             $newItem = new $model($validatedData);
             $newItem->save();
-
+    
             return redirect()->route('dashboard')->with('success', ucfirst($section) . ' creado con éxito.');
         } catch (\Exception $e) {
             Log::error("Error al agregar $section: " . $e->getMessage());
@@ -290,13 +286,22 @@ class DashboardController extends Controller
     {
         foreach (['imagen', 'imagen1', 'imagen2', 'imagen3', 'logo'] as $field) {
             if ($request->hasFile($field)) {
-                // Guardar la imagen en storage/app/public/imagenes/$section
-                $path = $request->file($field)->store("imagenes/$section", 'public');
-
+                // Guardar el logo de empresas en la carpeta 'logos', el resto en 'imagenes/$section'
+                if ($section === 'empresas' && $field === 'logo') {
+                    $folder = 'logos';
+                } else {
+                    $folder = "imagenes/$section";
+                }
+    
+                // Guardar la imagen en storage/app/public/$folder
+                $path = $request->file($field)->store($folder, 'public');
+    
                 // Guardar solo la ruta relativa en la base de datos
                 $validatedData[$field] = $path;
             }
         }
+    
         return $validatedData;
     }
+    
 }

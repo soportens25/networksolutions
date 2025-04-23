@@ -22,7 +22,7 @@ Route::get('/categoria/{id}', [LandingController::class, 'mostrarPorCategoria'])
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Rutas del panel (dashboard) protegidas bajo "auth" y "role:admin"
-Route::middleware(['auth', 'role:admin|empresarial'])->prefix('dashboard')->group(function () {
+Route::middleware(['auth', 'role:admin|empresarial|tecnico'])->prefix('dashboard')->group(function () {
     // Ruta principal del dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 

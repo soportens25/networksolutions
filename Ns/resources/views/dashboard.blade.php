@@ -59,6 +59,10 @@
 <div id="inventario" class="content-section hidden">
     @include('partials.inventario', ['empresas' => $empresas])
 </div>
+<div id="calendario" class="content-section hidden">
+    @include('partials.calendar')
+</div>
+
 
 @endsection
 

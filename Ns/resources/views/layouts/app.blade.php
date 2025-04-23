@@ -61,6 +61,14 @@
                                 <span>Inventario</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="#"
+                                class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                                data-target="calendario">
+                                <i class="ri-calendar-todo-line"></i> 
+                                <span>Calendario</span>
+                            </a>
+                        </li>
                     @else
                         <li>
                             <a href="#"
@@ -102,6 +110,14 @@
                                 <span>Inventario</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="#"
+                                class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                                data-target="calendario">
+                                <i class="ri-calendar-todo-line"></i> 
+                                <span>Calendario</span>
+                            </a>
+                        </li>
                     @endrole
                 </ul>
             </nav>
@@ -125,10 +141,12 @@
                                 <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Perfil</a>
                             </li>
                             <li>
-                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Configuraciones</a>
+                                <a href="#"
+                                    class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Configuraciones</a>
                             </li>
                             <li>
-                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
+                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Cerrar
+                                    sesión</a>
                             </li>
                         </ul>
                     </div>
@@ -137,7 +155,8 @@
 
             <!-- Banner del apartado -->
             @hasSection('apartado')
-                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-5 px-8 shadow-lg rounded-xl mx-4 md:mx-20 mt-6 mb-6 animate-fade-in">
+                <div
+                    class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-5 px-8 shadow-lg rounded-xl mx-4 md:mx-20 mt-6 mb-6 animate-fade-in">
                     <h1 class="text-2xl md:text-3xl font-bold flex items-center gap-3">
                         @yield('apartado')
                     </h1>

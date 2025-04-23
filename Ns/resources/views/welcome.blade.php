@@ -97,7 +97,7 @@
                             <ul style="background-color: gray; color: #bfc0c2;" class="dropdown-menu"
                                 aria-labelledby="dropdownMenuButton1">
                                 <li><a class="dropdown-item text-stone-300" href="{{ route('profile.update') }}">Ver
-                                        perfil</a></li>
+                                            perfil</a></li>
                                 @if (auth()->check() && auth()->user()->hasRole('admin|empresarial'))
                                     <li>
                                         <a href="{{ route('dashboard') }}" class="dropdown-item text-stone-300">Panel de
@@ -143,8 +143,7 @@
                     tecnológicos.</p>
             </div>
         </div>
-    </section>
-
+    </section>  
 
     <section id="services" class="py-12 bg-gray-50">
         <div class="container mx-auto px-6">
