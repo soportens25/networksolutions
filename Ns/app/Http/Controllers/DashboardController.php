@@ -209,7 +209,7 @@ class DashboardController extends Controller
             ],
             'servicios' => [
                 'servicio' => 'required|string|max:150',
-                'tipo' => 'required|string|max:100',
+                'tipo' => 'required|string',
                 'especificacion' => 'nullable|string',
                 'imagen' => 'nullable|mimes:jpeg,png,jpg,gif,svg,webp,avif|max:2048',
                 'imagen1' => 'nullable|mimes:jpeg,png,jpg,gif,svg,webp,avif|max:2048',
