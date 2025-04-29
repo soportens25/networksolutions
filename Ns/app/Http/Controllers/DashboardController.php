@@ -8,19 +8,20 @@ use Maatwebsite\Excel\Facades\Excel;
 use PDF;
 use App\Models\{User, Categoria, Producto, Servicio, Factura, Estado, Empresa, Inventario, Historial_mantenimiento, Personal_encargado, Role};
 use App\Exports\InventarioExport;
+use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
 {
     public function index()
     {
         $user = auth()->user();
-    
+
         // Roles con acceso total
         $rolesConAccesoTotal = ['admin', 'tecnico'];
-    
+
         // ¿Tiene acceso total?
         $tieneAccesoTotal = $user->hasAnyRole($rolesConAccesoTotal);
-    
+
         if ($tieneAccesoTotal) {
             // Admin y técnico ven todo
             return view('dashboard', [
@@ -39,24 +40,24 @@ class DashboardController extends Controller
         } else {
             // Usuario empresarial: solo accede a sus empresas
             $empresaIds = $user->empresas()->pluck('empresas.id')->toArray();
-    
+
             return view('dashboard', [
                 'users' => User::with(['empresas', 'roles'])
                     ->whereHas('empresas', function ($q) use ($empresaIds) {
-                        $q->whereIn('empresas.id', $empresaIds);    
+                        $q->whereIn('empresas.id', $empresaIds);
                     })->get(),
-    
+
                 'empresas' => Empresa::whereIn('id', $empresaIds)->get(),
                 'inventarios' => Inventario::whereIn('id_empresa', $empresaIds)->get(),
-    
+
                 'historial_mantenimiento' => Historial_mantenimiento::all(),
-    
-                'personal_encargado' => Personal_encargado::all(),  
-    
+
+                'personal_encargado' => Personal_encargado::all(),
+
                 'roles' => Role::all() // o limitar si lo necesitás
             ]);
         }
-    }    
+    }
 
     public function store(Request $request, $section)
     {
@@ -71,25 +72,25 @@ class DashboardController extends Controller
             if ($section === 'usuarios') {
                 $empresaId = $request->input('empresa');
                 $rolName = $request->input('rol');
-    
+
                 $empresa = Empresa::findOrFail($empresaId);
                 $rol = \Spatie\Permission\Models\Role::where('name', $rolName)->firstOrFail();
-    
+
                 $user = new User($validatedData);
                 $user->save();
-    
+
                 $user->assignRole($rolName);
                 $user->empresas()->attach($empresaId, ['role_id' => $rol->id]);
-    
+
                 return redirect()->route('dashboard')->with('success', 'Usuario creado y asignado a la empresa correctamente.');
             }
-    
+
             // 👉 Procesar imágenes para secciones que no son "usuarios"
             $validatedData = $this->handleImages($request, $validatedData, $section);
-    
+
             $newItem = new $model($validatedData);
             $newItem->save();
-    
+
             return redirect()->route('dashboard')->with('success', ucfirst($section) . ' creado con éxito.');
         } catch (\Exception $e) {
             Log::error("Error al agregar $section: " . $e->getMessage());
@@ -143,19 +144,19 @@ class DashboardController extends Controller
         if ($section === 'inventarios') {
             $user = auth()->user();
             $rolesConAccesoTotal = ['admin', 'tecnico'];
-    
+
             // Si el usuario es admin o técnico, exporta todo
             if ($user->hasAnyRole($rolesConAccesoTotal)) {
                 return Excel::download(new InventarioExport(), 'inventario.xlsx');
             }
-    
+
             // Si no, exporta solo su inventario
             $empresaIds = $user->empresas()->pluck('empresas.id')->toArray();
             return Excel::download(new InventarioExport($empresaIds), 'inventario_empresa.xlsx');
         }
-    
+
         return redirect()->route('dashboard')->with('error', 'Exportación no disponible para esta sección.');
-    }    
+    }
 
     public function exportPdf($section, $id)
     {
@@ -251,8 +252,18 @@ class DashboardController extends Controller
                 'observaciones' => 'nullable|string',
             ],
             'empresas' => [
-                'nombre_empresa' => 'required|string|max:255|unique:empresas,nombre_empresa',
-                'nit' => 'required|string|max:100|unique:empresas,nit',
+                'nombre_empresa' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('empresas', 'nombre_empresa')->ignore($id),
+                ],
+                'nit' => [
+                    'required',
+                    'string',
+                    'max:100',
+                    Rule::unique('empresas', 'nit')->ignore($id),
+                ],
                 'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp,avif|max:2048',
             ],
             'historial_mantenimiento' => [
@@ -292,16 +303,15 @@ class DashboardController extends Controller
                 } else {
                     $folder = "imagenes/$section";
                 }
-    
+
                 // Guardar la imagen en storage/app/public/$folder
                 $path = $request->file($field)->store($folder, 'public');
-    
+
                 // Guardar solo la ruta relativa en la base de datos
                 $validatedData[$field] = $path;
             }
         }
-    
+
         return $validatedData;
     }
-    
 }

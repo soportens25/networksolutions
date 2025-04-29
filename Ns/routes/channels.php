@@ -12,10 +12,15 @@ use Illuminate\Support\Facades\Broadcast;
 | used to check if an authenticated user can listen to the channel.
 |
 */
-Broadcast::channel('ticket.{id}', function ($user, $id) {
-    return true; // Permitir acceso a usuarios autenticados
+Broadcast::channel('ticket.{ticketId}', function ($user, $ticketId) {
+    // Para pruebas, puedes poner temporalmente:
+    return true;
+    // O la lógica real:
+    // return $user->tickets()->where('id', $ticketId)->exists();
 });
+    
 
+// Canal de presencia de usuario (opcional)
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });

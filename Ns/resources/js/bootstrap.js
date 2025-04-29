@@ -4,20 +4,19 @@ import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 
 window.Echo = new Echo({
-
     broadcaster: 'pusher',
-    key: 'local',
-    wsHost: window.location.hostname,
-    wsPort: 6001,
-    forceTLS: false,
-    disableStats: true,
-    enabledTransports: ['ws', 'wss'],
-    // Opciones de reconexión (estas opciones pueden variar según la versión de Pusher JS)
-    // La librería Pusher JS reconecta automáticamente por defecto, pero se pueden ajustar parámetros:
-    // reconnection: true, // generalmente está activado por defecto
-    // reconnectionAttempts: 10,
-    // reconnectionDelay: 1000, // 1 segundo
+    key: 'bd78fd19b532a3125db2', // Tu PUSHER_APP_KEY
+    cluster: 'us2',             // Tu PUSHER_APP_CLUSTER
+    forceTLS: true,
+    // Si tu app está en /Ns/Ns/public, agrega el endpoint:
+    authEndpoint: '/Ns/Ns/public/broadcasting/auth',
+    auth: {
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    }
 });
+
 
 // Para depuración, muestra eventos de conexión
 window.Echo.connector.pusher.connection.bind('connected', () => {

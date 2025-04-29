@@ -19,7 +19,7 @@ class AuthenticatedSessionController extends Controller
     public function create(): View
     {
         return view('auth.login', [
-            'recaptchaKey' => env('RECAPTCHA_SITE_KEY')
+            'recaptchaKey' => config('services.recaptcha.key')
         ]);
     }
 
@@ -28,9 +28,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        // ✅ Primero validamos el captcha
+        // Validar reCAPTCHA
         $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-            'secret' => env('RECAPTCHA_SECRET'),
+            'secret' => config('services.recaptcha.secret'),
             'response' => $request->input('g-recaptcha-response'),
             'remoteip' => $request->ip(),
         ]);
@@ -43,12 +43,19 @@ class AuthenticatedSessionController extends Controller
             ])->withInput();
         }
 
-        $request->authenticate();
+        // Autenticación manual
+        $credentials = $request->only('email', 'password');
+        if (!Auth::attempt($credentials, $request->filled('remember'))) {
+            return back()->withErrors([
+                'email' => 'Las credenciales no coinciden con nuestros registros.',
+            ])->withInput();
+        }
 
         $request->session()->regenerate();
 
         return redirect()->intended(RouteServiceProvider::HOME);
     }
+
 
     /**
      * Destroy an authenticated session.

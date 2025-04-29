@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Events\TicketAssigned;
 
-class TicketController extends Controller
+class TechnicianStatusController extends Controller
 {
     public function index()
     {

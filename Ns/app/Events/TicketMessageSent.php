@@ -1,7 +1,5 @@
 <?php
 
-// app/Events/TicketMessageSent.php
-
 namespace App\Events;
 
 use App\Models\Message;
@@ -9,9 +7,11 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Broadcasting\PrivateChannel;
 
-class TicketMessageSent implements ShouldBroadcast
+
+class TicketMessageSent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -24,7 +24,7 @@ class TicketMessageSent implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new Channel('ticket.' . $this->message->ticket_id);
+        return new PrivateChannel('ticket.' . $this->message->ticket_id);
     }
 
     public function broadcastWith()

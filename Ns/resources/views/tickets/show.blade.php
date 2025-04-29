@@ -20,14 +20,15 @@
     </div>
 
     <div class="container mx-auto px-4 py-8">
-
         <!-- Encabezado -->
         <div class="bg-white p-6 rounded-2xl shadow-xl mb-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div><strong class="text-gray-700">Título:</strong> {{ $ticket->title }}</div>
-                <div><strong class="text-gray-700">Técnico:</strong> {{ $ticket->assignedUser->name ?? 'No asignado' }}</div>
-                <div><strong class="text-gray-700">Estado:</strong> 
-                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold {{ $ticket->status == 'open' ? 'bg-green-200 text-green-800' : ($ticket->status == 'in_progress' ? 'bg-yellow-200 text-yellow-800' : ($ticket->status == 'resolved' ? 'bg-blue-200 text-blue-800' : 'bg-gray-200 text-gray-800')) }}">
+                <div><strong class="text-gray-700">Técnico:</strong> {{ $ticket->assignedUser->name ?? 'No asignado' }}
+                </div>
+                <div><strong class="text-gray-700">Estado:</strong>
+                    <span
+                        class="inline-block px-3 py-1 rounded-full text-xs font-semibold {{ $ticket->status == 'open' ? 'bg-green-200 text-green-800' : ($ticket->status == 'in_progress' ? 'bg-yellow-200 text-yellow-800' : ($ticket->status == 'resolved' ? 'bg-blue-200 text-blue-800' : 'bg-gray-200 text-gray-800')) }}">
                         {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
                     </span>
                 </div>
@@ -95,6 +96,7 @@
         const ticketId = document.getElementById('ticket_id').value;
         const userId = document.getElementById('user_id').value;
         const typingIndicator = document.getElementById('typing-indicator');
+        const userName = @json(auth()->user()->name);
 
         axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').content;
 
@@ -108,22 +110,27 @@
             }).then(() => {
                 messageInput.value = '';
             }).catch(error => {
-                console.error("❌ Error al enviar mensaje:", error.response.data);
+                console.error("❌ Error al enviar mensaje:", error.response?.data || error);
             });
         });
 
         window.Pusher = Pusher;
+
         window.Echo = new Echo({
             broadcaster: 'pusher',
-            key: 'local',
-            wsHost: window.location.hostname,
-            wsPort: 6001,
-            forceTLS: false,
-            disableStats: true,
-            enabledTransports: ['ws']
+            key: 'bd78fd19b532a3125db2', // Tu PUSHER_APP_KEY
+            cluster: 'us2', // Tu PUSHER_APP_CLUSTER
+            forceTLS: true,
+            authEndpoint: '/Ns/Ns/public/broadcasting/auth',
+            auth: {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            }
         });
 
-        const ticketChannel = window.Echo.channel(`ticket.${ticketId}`);
+        // Suscribirse al canal privado del ticket
+        const ticketChannel = window.Echo.private(`ticket.${ticketId}`);
 
         ticketChannel.listen('TicketMessageSent', (event) => {
             const exists = document.getElementById('msg-' + event.id);
@@ -152,10 +159,30 @@
             }
 
             if (event.user.id != userId) {
-                axios.post('/api/read', {
+                axios.post('/Ns/Ns/public/api/read', {
                     ticket_id: ticketId,
                     message_id: event.id
                 });
+            }
+        });
+
+        // Indicador de "escribiendo..." usando whispers de Echo/Pusher
+        let typingTimeout;
+        messageInput.addEventListener('input', () => {
+            ticketChannel.whisper('typing', {
+                user_id: userId,
+                name: userName
+            });
+        });
+
+        ticketChannel.listenForWhisper('typing', (e) => {
+            if (e.user_id != userId) {
+                typingIndicator.textContent = `${e.name} está escribiendo...`;
+                typingIndicator.classList.remove('hidden');
+                clearTimeout(window.typingTimeout);
+                window.typingTimeout = setTimeout(() => {
+                    typingIndicator.classList.add('hidden');
+                }, 1200);
             }
         });
 

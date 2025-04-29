@@ -22,10 +22,9 @@ class RegisteredUserController extends Controller
     public function create(): View
     {
         return view('auth.register', [
-            'recaptchaKey' => env('RECAPTCHA_SITE_KEY'),
+            'recaptchaKey' => config('services.recaptcha.key'),
         ]);
     }
-
     /**
      * Handle an incoming registration request.
      *
@@ -40,7 +39,7 @@ class RegisteredUserController extends Controller
         ]);
 
         $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-            'secret' => env('RECAPTCHA_SECRET'),
+            'secret' => config('services.recaptcha.secret'),
             'response' => $request->input('g-recaptcha-response'),
             'remoteip' => $request->ip(),
         ]);

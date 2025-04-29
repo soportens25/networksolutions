@@ -1,9 +1,17 @@
 <?php
 
-use App\Http\Controllers\{ProfileController, DashboardController, LandingController, AuthController, TicketViewController, TicketController, MessageController, TechnicianStatusController};
+use App\Http\Controllers\{
+    ProfileController,
+    DashboardController,
+    LandingController,
+    AuthController,
+    TicketViewController,
+    TicketController,
+    MessageController,
+    TechnicianStatusController
+};
 use Illuminate\Support\Facades\Route;
 use BeyondCode\LaravelWebSockets\Facades\WebSocketsRouter;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +31,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Rutas del panel (dashboard) protegidas bajo "auth" y "role:admin"
 Route::middleware(['auth', 'role:admin|empresarial|tecnico'])->prefix('dashboard')->group(function () {
-    // Ruta principal del dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // Perfil de usuario
@@ -41,18 +48,21 @@ Route::middleware(['auth', 'role:admin|empresarial|tecnico'])->prefix('dashboard
     Route::get('/export-excel/{section}', [DashboardController::class, 'exportExcel'])->name('dashboard.exportExcel');
 });
 
+// Solo define el resource una vez, fuera del grupo de middleware
 Route::resource('tickets', TicketController::class);
 
+// Rutas adicionales protegidas por auth
 Route::middleware(['auth'])->group(function () {
-    Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
-    Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
-    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
-    Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
+    // Si necesitas rutas adicionales para tickets, usa nombres diferentes o elimina estas si no son necesarias.
+    // Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+    // Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
+    // Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
+    // Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
+
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::post('/technician/status', [TicketController::class, 'updateStatus'])->name('technician.status.update');
-    Route::post('/technician/status', [TicketController::class, 'updateTechnicianStatus'])->name('technician.status.update');
+    Route::post('/technician/status', [TicketController::class, 'updateTechnicianStatus'])->name('technician.status.updateTechnician');
     Route::post('/tickets/{id}/self-assign', [TicketController::class, 'selfAssign'])->name('tickets.selfAssign');
 });
-
 
 require __DIR__ . '/auth.php';

@@ -30,6 +30,7 @@ class InventarioExport implements FromQuery, WithHeadings, WithMapping
     public function headings(): array
     {
         return [
+            'Empresa',
             'Nombre Equipo',
             'Marca Equipo',
             'Tipo Equipo',
@@ -52,14 +53,13 @@ class InventarioExport implements FromQuery, WithHeadings, WithMapping
             'Licencias',
             'Periféricos',
             'Observaciones',
-            'Creado',
-            'Actualizado',
         ];
     }
 
     public function map($inventario): array
     {
         return [
+            $inventario->empresa->nombre_empresa,   
             $inventario->nombre_equipo,
             $inventario->marca_equipo,
             $inventario->tipo_equipo,
