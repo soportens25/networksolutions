@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Network Solutions - {{ $servicio->servicio }}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="website icon" href="{{ asset('storage/image/logo.jpg') }}">
     <style>
         body {
@@ -63,11 +64,13 @@
             margin-bottom: 20px;
         }
 
-        .seccion-superior .imagen img {
-            width: 50%;
+        .seccion-superior .imagen img { 
             max-height: 400px;
             object-fit: cover;
             border-radius: 10px;
+            display: block;
+            margin: 0 auto;
+            /* ✅ Esto la centra horizontalmente */
         }
 
         .seccion-superior .texto {
@@ -88,7 +91,7 @@
             color: #555555;
             /* Texto gris oscuro */
             margin-bottom: 10px;
-            
+
         }
 
         .seccion-superior .especificacion {
@@ -222,11 +225,11 @@
 
             <!-- Texto -->
             <div class="texto">
-                <h1>{{ $servicio->servicio }}</h1>
-                <p><strong>{{ $servicio->tipo }}</strong></p>
+                <h1>{!! $servicio->servicio !!}</h1>
+                <p><strong>{!! $servicio->tipo !!}</strong></p>
                 @if ($servicio->especificacion)
                     <div class="especificacion">
-                        <p>{{ $servicio->especificacion }}</p>
+                        <p class="text-sm text-gray-600 leading-relaxed">{!! nl2br(e($servicio->especificacion)) !!}</p>
                     </div>
                 @endif
             </div>

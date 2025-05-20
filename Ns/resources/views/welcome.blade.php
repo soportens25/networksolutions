@@ -168,7 +168,7 @@
                                         @endif
 
                                         <h3 class="text-xl font-semibold text-gray-800">{{ $servicio->servicio }}</h3>
-                                        <p class="text-sm text-gray-600 mt-2 leading-relaxed">{{ $servicio->tipo }}</p>
+                                        <p class="text-sm text-gray-600 mt-2 leading-relaxed">{!! $servicio->tipo !!}</p>
                                     </a>
                                 </div>
                             </div>

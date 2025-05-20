@@ -18,8 +18,9 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <!-- Favicon -->
+    <link href="https://unpkg.com/tabulator-tables@5.4.3/dist/css/tabulator.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/tabulator-tables@5.4.3/dist/js/tabulator.min.js"></script>
+        <!-- Favicon -->
     <link rel="icon" href="{{ asset('storage/image/logo.jpg') }}">
 
     <style>
@@ -48,7 +49,7 @@
         <!-- Sidebar -->
         <aside class="w-64 bg-gray-900 text-white flex flex-col">
             <div class="flex items-center justify-center h-20 border-b border-gray-700">
-                <h1 class="text-2xl font-semibold">Mi Aplicación</h1>
+                <h1 class="text-2xl font-semibold">NETWORK SOLUTIONS</h1>
             </div>
             <nav class="flex-1 px-4 py-6">
                 <ul class="space-y-4">
@@ -64,9 +65,9 @@
                         <li>
                             <a href="#"
                                 class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
-                                data-target="calendario">
-                                <i class="ri-calendar-todo-line"></i> 
-                                <span>Calendario</span>
+                                data-target="docs">
+                                <i class="ri-docs-todo-line"></i> 
+                                <span>docs</span>
                             </a>
                         </li>
                     @else
@@ -113,9 +114,9 @@
                         <li>
                             <a href="#"
                                 class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
-                                data-target="calendario">
-                                <i class="ri-calendar-todo-line"></i> 
-                                <span>Calendario</span>
+                                data-target="docs">
+                                <i class="ri-article-line"></i>
+                                <span>Documentos</span>
                             </a>
                         </li>
                     @endrole
@@ -146,7 +147,7 @@
                             </li>
                             <li>
                                 <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Cerrar
-                                    sesión</a>
+                                    sesi車n</a>
                             </li>
                         </ul>
                     </div>

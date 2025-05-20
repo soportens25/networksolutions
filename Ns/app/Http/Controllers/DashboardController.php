@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Hash, Storage, Log};
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
-use App\Models\{User, Categoria, Producto, Servicio, Factura, Estado, Empresa, Inventario, Historial_mantenimiento, Personal_encargado, Role};
+use App\Models\{User, Categoria, Producto, Servicio, Factura, Estado, Empresa, Inventario, Historial_mantenimiento, Personal_encargado, Role, Ticket};
 use App\Exports\InventarioExport;
 use Illuminate\Validation\Rule;
 
@@ -15,16 +15,65 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-
-        // Roles con acceso total
         $rolesConAccesoTotal = ['admin', 'tecnico'];
-
-        // ¿Tiene acceso total?
         $tieneAccesoTotal = $user->hasAnyRole($rolesConAccesoTotal);
 
+        // Meses del año
+        $meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+        // Helper para obtener conteo por mes
+        $conteoPorMes = function ($model) {
+            $result = array_fill(0, 12, 0);
+            $data = $model::selectRaw('MONTH(created_at) as mes, COUNT(*) as cantidad')
+                ->groupBy('mes')
+                ->orderBy('mes')
+                ->get();
+
+            foreach ($data as $item) {
+                $result[$item->mes - 1] = $item->cantidad;
+            }
+
+            return $result;
+        };
+
+        $nombresPorMes = function ($model, $columna = 'nombre') {
+            return $model::selectRaw('MONTH(created_at) as mes, ' . $columna)
+                ->get()
+                ->groupBy('mes')
+                ->map(function ($items) use ($columna) {
+                    return $items->pluck($columna)->toArray();
+                })
+                ->toArray();
+        };
+
+        // Preparar datos para los gráficos
+        $dataForCharts = [
+            'Usuarios Registrados por Mes' => $conteoPorMes(User::class),
+            'Categorias' => $conteoPorMes(Categoria::class),
+            'Productos' => $conteoPorMes(Producto::class),
+            'Servicios' => $conteoPorMes(Servicio::class),
+            'Empresas' => $conteoPorMes(Empresa::class),
+            'Tickets' => $conteoPorMes(Ticket::class),
+
+            'Detalle Usuarios' => $nombresPorMes(User::class, 'name'),
+            'Detalle Categorias' => $nombresPorMes(Categoria::class, 'categoria'),
+            'Detalle Productos' => $nombresPorMes(Producto::class, 'producto'),
+            'Detalle Servicios' => $nombresPorMes(Servicio::class, 'servicio'),
+            'Detalle Empresas' => $nombresPorMes(Empresa::class, 'nombre_empresa'),
+            'Detalle Tickets' => $nombresPorMes(Ticket::class, 'title'), // o título si aplica
+        ];
+
+        // Datos comunes
+        $comunes = [
+            'dataForCharts' => $dataForCharts,
+            'meses' => $meses,
+            'roles' => Role::all(),
+            'historial_mantenimiento' => Historial_mantenimiento::all(),
+            'personal_encargado' => Personal_encargado::all(),
+        ];
+
         if ($tieneAccesoTotal) {
-            // Admin y técnico ven todo
-            return view('dashboard', [
+            return view('dashboard', array_merge($comunes, [
                 'users' => User::with(['empresas', 'roles'])->get(),
                 'categorias' => Categoria::all(),
                 'productos' => Producto::all(),
@@ -33,29 +82,17 @@ class DashboardController extends Controller
                 'estados' => Estado::all(),
                 'empresas' => Empresa::all(),
                 'inventarios' => Inventario::all(),
-                'historial_mantenimiento' => Historial_mantenimiento::all(),
-                'personal_encargado' => Personal_encargado::all(),
-                'roles' => Role::all()
-            ]);
+            ]));
         } else {
-            // Usuario empresarial: solo accede a sus empresas
             $empresaIds = $user->empresas()->pluck('empresas.id')->toArray();
 
-            return view('dashboard', [
+            return view('dashboard', array_merge($comunes, [
                 'users' => User::with(['empresas', 'roles'])
-                    ->whereHas('empresas', function ($q) use ($empresaIds) {
-                        $q->whereIn('empresas.id', $empresaIds);
-                    })->get(),
-
+                    ->whereHas('empresas', fn($q) => $q->whereIn('empresas.id', $empresaIds))
+                    ->get(),
                 'empresas' => Empresa::whereIn('id', $empresaIds)->get(),
                 'inventarios' => Inventario::whereIn('id_empresa', $empresaIds)->get(),
-
-                'historial_mantenimiento' => Historial_mantenimiento::all(),
-
-                'personal_encargado' => Personal_encargado::all(),
-
-                'roles' => Role::all() // o limitar si lo necesitás
-            ]);
+            ]));
         }
     }
 
@@ -313,5 +350,26 @@ class DashboardController extends Controller
         }
 
         return $validatedData;
+    }
+
+    public function graficosTable()
+    {
+        $models = [
+            'Usuarios' => User::class,
+            'Categoria' => Categoria::class,
+            'Productos' => Producto::class,
+            'Servicios' => Servicio::class,
+            'Empresas' => Empresa::class,
+        ];
+
+        $labels = [];
+        $data = [];
+
+        foreach ($models as $label => $model) {
+            $labels[] = $label;
+            $data[] = $model::count(); // cuenta total de registros
+        }
+
+        return view('dashboard', compact('labels', 'data'));
     }
 }
