@@ -8,8 +8,8 @@
 
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- Remixicon -->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -20,7 +20,7 @@
     <!-- DataTables JS -->
     <link href="https://unpkg.com/tabulator-tables@5.4.3/dist/css/tabulator.min.css" rel="stylesheet">
     <script src="https://unpkg.com/tabulator-tables@5.4.3/dist/js/tabulator.min.js"></script>
-        <!-- Favicon -->
+    <!-- Favicon -->
     <link rel="icon" href="{{ asset('storage/image/logo.jpg') }}">
 
     <style>
@@ -66,7 +66,7 @@
                             <a href="#"
                                 class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
                                 data-target="docs">
-                                <i class="ri-docs-todo-line"></i> 
+                                <i class="ri-docs-todo-line"></i>
                                 <span>docs</span>
                             </a>
                         </li>
@@ -147,7 +147,7 @@
                             </li>
                             <li>
                                 <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Cerrar
-                                    sesi車n</a>
+                                    sesión</a>
                             </li>
                         </ul>
                     </div>

@@ -2,8 +2,8 @@
 
 <!-- Botón para abrir el modal -->
 <div class="d-flex justify-content-end mb-3">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
-        Agregar Producto
+    <button type="button" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded shadow" data-bs-toggle="modal" data-bs-target="#addProductModal">
+        + Agregar Producto
     </button>
 </div>
 
@@ -47,15 +47,15 @@
                             method="POST" onsubmit="return confirm('¿Eliminar producto?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded">🗑️ Eliminar</button>
                         </form>
-                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded mt-4" data-bs-toggle="modal"
                             data-bs-target="#editProductModal" data-id="{{ $producto->id }}"
                             data-producto="{{ $producto->producto }}" data-descripcion="{{ $producto->descripcion }}"
                             data-stock="{{ $producto->stock }}" data-precio="{{ $producto->precio }}"
                             data-categoria="{{ $producto->id_categoria }}" data-estado="{{ $producto->id_estado }}"
                             data-url="{{ route('dashboard.update', ['section' => 'productos', 'id' => $producto->id]) }}">
-                            Editar
+                            📝 Editar
                         </button>
 
                     </td>

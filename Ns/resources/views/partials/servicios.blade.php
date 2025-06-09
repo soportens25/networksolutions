@@ -2,9 +2,9 @@
 
 <!-- Botón para abrir el modal de agregar servicio -->
 <div class="relative mb-4">
-    <button type="button" class="absolute top-0 right-0 btn btn-primary" data-bs-toggle="modal"
+    <button type="button" class="absolute top-0 right-0 bg-green-500 hover:bg-green-600 text-white p-2 rounded shadow" data-bs-toggle="modal"
         data-bs-target="#addServiceModal">
-        Agregar Servicio
+        + Agregar Servicio
     </button>
 </div>
 
@@ -54,13 +54,13 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit"
-                                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Eliminar</button>
-                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                class="bg-red-500 hover:bg-red-600 text-white p-2 rounded">🗑️ Eliminar</button>
+                            <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded mt-4" data-bs-toggle="modal"
                                 data-bs-target="#editServiceModal" data-id="{{ $servicio->id }}"
                                 data-servicio="{{ $servicio->servicio }}" data-tipo="{{ $servicio->tipo }}"
                                 data-especificacion="{{ $servicio->especificacion }}"
                                 data-url="{{ route('dashboard.update', ['section' => 'servicios', 'id' => $servicio->id]) }}">
-                                Editar
+                                📝 Editar
                             </button>
                         </form>
                     </td>

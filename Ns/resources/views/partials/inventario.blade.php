@@ -45,8 +45,8 @@
                         <td>{{ $item->empresa->nombre_empresa ?? 'N/D' }}</td>
                         <td>
                             <a href="{{ route('dashboard.exportPdf', ['section' => 'inventarios', 'id' => $item->id]) }}"
-                                class="btn btn-secondary btn-sm mb-2">
-                                <i class="ri-file-pdf-2-line"></i> PDF
+                                class="bg-red-600 hover:bg-red-500 text-white rounded p-2 my-4 no-underline mb-2">
+                                📄 PDF
                             </a>
                             @role('admin|tecnico')
                             <form
@@ -54,9 +54,9 @@
                                 method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm"
+                                <button type="submit" class="bg-yellow-500 hover:bg-yellow-400 text-white p-2 mt-4 rounded"
                                     onclick="return confirm('¿Eliminar este equipo?')">
-                                    <i class="ri-delete-bin-6-line"></i> Eliminar
+                                    🗑️ Eliminar
                                 </button>
                             </form>
                             @endrole
@@ -64,13 +64,13 @@
                         @role('admin|tecnico')
                         <td>
                             <!-- Botón para abrir el modal de Historial de Mantenimiento -->
-                            <button type="button" class="btn btn-primary btn-sm mb-2" data-bs-toggle="modal"
+                            <button type="button" class="bg-green-500 hover:bg-green-600 text-white rounded p-2" data-bs-toggle="modal"
                                 data-bs-target="#modalMantenimiento-{{ $item->id }}">
                                 <i class="ri-tools-line"></i> Mantenimiento
                             </button>
 
                             <!-- Botón para abrir el modal de Personal Encargado -->
-                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal"
+                            <button type="button" class="bg-green-500 hover:bg-green-600 text-white rounded p-2 mt-4" data-bs-toggle="modal"
                                 data-bs-target="#modalEncargado-{{ $item->id }}">
                                 <i class="ri-user-add-line"></i> Encargado
                             </button>

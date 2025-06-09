@@ -3,8 +3,8 @@
 
 <!-- Botón para abrir el modal -->
 <div class="flex justify-end mb-4">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-        Agregar Usuario
+    <button type="button" class="bg-green-500 hover:bg-green-600 p-2 text-white rounded" data-bs-toggle="modal" data-bs-target="#addUserModal">
+       + Agregar Usuario
     </button>
 </div>
 
@@ -58,11 +58,11 @@
             </td>
 
             <td class="p-3 flex space-x-2">
-                <button class="btn btn-warning">Editar</button>
+                <button class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">📝 Editar</button>
                 <form action="{{ route('dashboard.destroy', ['section' => 'usuarios', 'id' => $user->id]) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded">🗑️ Eliminar</button>
                 </form>
             </td>
         </tr>

@@ -34,21 +34,21 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-warning btn-sm"
+                                    <button class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded mt-4"
                                         data-bs-toggle="modal"
                                         data-bs-target="#editEmpresaModal"
                                         data-id="{{ $empresa->id }}"
                                         data-nombre="{{ $empresa->nombre_empresa }}"
                                         data-nit="{{ $empresa->nit }}"
                                         data-url="{{ route('dashboard.update', ['section' => 'empresas', 'id' => $empresa->id]) }}">
-                                        <i class="bi bi-pencil"></i> Editar
+                                        📝 Editar
                                     </button>
                                     <form action="{{ route('dashboard.destroy', ['section' => 'empresas', 'id' => $empresa->id]) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm"
+                                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded"
                                             onclick="return confirm('¿Seguro que deseas eliminar esta empresa?')">
-                                            <i class="bi bi-trash"></i> Eliminar
+                                            🗑️ Eliminar
                                         </button>
                                     </form>
                                 </td>
