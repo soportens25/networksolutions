@@ -63,6 +63,10 @@
     <div id="docs" class="content-section hidden">
         @include('partials.docs')
     </div>
+        <div id="calendar" class="content-section hidden">
+        @include('partials.calendar')
+    </div>
+
 
 
     @endsection

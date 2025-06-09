@@ -114,6 +114,14 @@
                         <li>
                             <a href="#"
                                 class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                                data-target="calendar">
+                                <i class="ri-calendar-event-line"></i>
+                                <span>Calendario</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
                                 data-target="docs">
                                 <i class="ri-article-line"></i>
                                 <span>Documentos</span>
