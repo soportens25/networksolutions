@@ -46,6 +46,9 @@ Route::middleware(['auth', 'role:admin|empresarial|tecnico'])->prefix('dashboard
     // Funcionalidades específicas de exportación para inventario
     Route::get('/export-pdf/{section}/{id}', [DashboardController::class, 'exportPdf'])->name('dashboard.exportPdf');
     Route::get('/export-excel/{section}', [DashboardController::class, 'exportExcel'])->name('dashboard.exportExcel');
+
+    Route::get('/events', [DashboardController::class, 'calendar']);
+    Route::post('/events', [DashboardController::class, 'store_calendar']);
 });
 
 // Solo define el resource una vez, fuera del grupo de middleware

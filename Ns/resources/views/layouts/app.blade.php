@@ -21,6 +21,14 @@
     <link href="https://unpkg.com/tabulator-tables@5.4.3/dist/css/tabulator.min.css" rel="stylesheet">
     <script src="https://unpkg.com/tabulator-tables@5.4.3/dist/js/tabulator.min.js"></script>
     <!-- Favicon -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <!-- Head -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light-border.css" />   
     <link rel="icon" href="{{ asset('storage/image/logo.jpg') }}">
 
     <style>
@@ -49,7 +57,7 @@
         <!-- Sidebar -->
         <aside class="w-64 bg-gray-900 text-white flex flex-col">
             <div class="flex items-center justify-center h-20 border-b border-gray-700">
-                <h1 class="text-2xl font-semibold">NETWORK SOLUTIONS</h1>
+                <img src="{{ asset('storage/image/icono_ns.png') }}" alt="Logo" class="w-20 h-20">
             </div>
             <nav class="flex-1 px-4 py-6">
                 <ul class="space-y-4">
@@ -114,7 +122,7 @@
                         <li>
                             <a href="#"
                                 class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
-                                data-target="calendar">
+                                data-target="calendario">
                                 <i class="ri-calendar-event-line"></i>
                                 <span>Calendario</span>
                             </a>

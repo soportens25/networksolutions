@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\{Hash, Storage, Log};
+use Illuminate\Support\Facades\{Hash, Storage, Log, Auth};
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
 use App\Models\{User, Categoria, Producto, Servicio, Factura, Estado, Empresa, Inventario, Historial_mantenimiento, Personal_encargado, Role, Ticket};
 use App\Exports\InventarioExport;
 use Illuminate\Validation\Rule;
+use App\Models\Event;
+use App\Mail\EventCreatedMail;
+use Illuminate\Support\Facades\Mail;
 
 class DashboardController extends Controller
 {
@@ -371,5 +374,29 @@ class DashboardController extends Controller
         }
 
         return view('dashboard', compact('labels', 'data'));
+    }
+    public function calendar()
+    {
+        return Event::all(['id', 'user_id', 'title', 'type', 'start', 'end']); // formato compatible con FullCalendar
+    }
+
+    public function store_calendar(Request $request)
+    {
+        $event = Event::create([
+            'user_id' => Auth::id(),
+            'title' => $request->input('title'),
+            'type'    => $request->input('type', 'evento'),
+            'start' => $request->input('start'),
+            'end' => $request->input('end')
+        ]);
+
+        // Obtener usuarios con rol admin (usando Spatie)
+        $admins = User::role('admin')->get();
+
+        foreach ($admins as $admin) {
+            Mail::to($admin->email)->send(new EventCreatedMail($event));
+        }
+
+        return response()->json($event, 201);
     }
 }

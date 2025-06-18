@@ -6,6 +6,8 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TechnicianStatusController;
 use App\Http\Controllers\TicketMessageController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\DashboardController;
+
 
 // Rutas RESTful para tickets con nombres únicos para la API
 Route::apiResource('tickets', TicketController::class)->names([
@@ -41,3 +43,5 @@ Route::post('/typing', function (Illuminate\Http\Request $request) {
     // Puedes emitir un evento aquí si lo deseas, pero para probar solo responde:
     return response()->json(['status' => 'ok']);
 });
+Route::get('/events', [DashboardController::class, 'calendar']);
+Route::post('/events', [DashboardController::class, 'store_calendar']);
