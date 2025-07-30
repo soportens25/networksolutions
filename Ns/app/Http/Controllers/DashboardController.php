@@ -51,19 +51,19 @@ class DashboardController extends Controller
 
         // Preparar datos para los gráficos
         $dataForCharts = [
-            'Usuarios Registrados por Mes' => $conteoPorMes(User::class),
+            'Usuarios Registrados' => $conteoPorMes(User::class),
             'Categorias' => $conteoPorMes(Categoria::class),
             'Productos' => $conteoPorMes(Producto::class),
             'Servicios' => $conteoPorMes(Servicio::class),
             'Empresas' => $conteoPorMes(Empresa::class),
             'Tickets' => $conteoPorMes(Ticket::class),
 
-            'Detalle Usuarios' => $nombresPorMes(User::class, 'name'),
+            'Detalle Usuarios Registrados' => $nombresPorMes(User::class, 'name'),
             'Detalle Categorias' => $nombresPorMes(Categoria::class, 'categoria'),
             'Detalle Productos' => $nombresPorMes(Producto::class, 'producto'),
             'Detalle Servicios' => $nombresPorMes(Servicio::class, 'servicio'),
             'Detalle Empresas' => $nombresPorMes(Empresa::class, 'nombre_empresa'),
-            'Detalle Tickets' => $nombresPorMes(Ticket::class, 'title'), // o título si aplica
+            'Detalle Tickets' => $nombresPorMes(Ticket::class, 'title'),
         ];
 
         // Datos comunes
@@ -73,6 +73,7 @@ class DashboardController extends Controller
             'roles' => Role::all(),
             'historial_mantenimiento' => Historial_mantenimiento::all(),
             'personal_encargado' => Personal_encargado::all(),
+            'eventos' => Event::all()
         ];
 
         if ($tieneAccesoTotal) {
@@ -204,16 +205,38 @@ class DashboardController extends Controller
             return redirect()->route('dashboard')->with('error', 'PDF no disponible para esta sección.');
         }
 
-        $inventario = Inventario::with('empresa')->findOrFail($id);
+        $inventario = Inventario::with(['empresa', 'historialMantenimiento', 'asignaciones'])->findOrFail($id);
 
         if (!$inventario->empresa) {
             return redirect()->route('dashboard')->with('error', 'No se encontró la empresa asociada.');
         }
 
         $empresa = $inventario->empresa;
-        $logo = $empresa->logo ?? 'default-logo.png';
 
-        $pdf = PDF::loadView('inventario.pdf', compact('inventario', 'empresa', 'logo'));
+        // Usa el logo asignado o un logo por defecto
+        $logoFile = $empresa->logo ?: 'image/logo.jpg';
+
+        // Ruta pública real (filesystem)
+        $logoPath = public_path('storage/' . $logoFile);
+
+        // Verifica existencia física, si no, usa uno por defecto garantizado
+        if (!file_exists($logoPath)) {
+            $logoFile = 'image/logo.jpg';
+            $logoPath = public_path('storage/' . $logoFile);
+        }
+
+        // Ruta accesible desde el navegador (si el PDF necesita usarla como src)
+        $empresaNet = Empresa::find(4); // o usa otro criterio si es necesario
+        $logoNetFile = $empresaNet && $empresaNet->logo ? $empresaNet->logo : 'image/logo.jpg';
+        $logoNet = public_path('storage/' . $logoNetFile);
+
+        $pdf = PDF::loadView('inventario.pdf', compact(
+            'inventario',
+            'empresa',
+            'logoPath',
+            'logoNet'
+        ));
+
         return $pdf->download('Hoja_de_vida_Equipo-' . $inventario->id . '.pdf');
     }
 

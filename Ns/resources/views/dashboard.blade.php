@@ -2,10 +2,6 @@
 
     @section('title', 'Panel de Control')
 
-    @push('styles')
-    <!-- Estilos específicos para el dashboard -->
-    @endpush
-
     @section('content')
 
     @role('admin')

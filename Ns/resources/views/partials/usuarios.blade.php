@@ -3,8 +3,9 @@
 
 <!-- Botón para abrir el modal -->
 <div class="flex justify-end mb-4">
-    <button type="button" class="bg-green-500 hover:bg-green-600 p-2 text-white rounded" data-bs-toggle="modal" data-bs-target="#addUserModal">
-       + Agregar Usuario
+    <button type="button" class="bg-green-500 hover:bg-green-600 p-2 text-white rounded" data-bs-toggle="modal"
+        data-bs-target="#addUserModal">
+        + Agregar Usuario
     </button>
 </div>
 
@@ -21,54 +22,57 @@
         </tr>
     </thead>
     <tbody>
-        @if(isset($users))
-        @foreach ($users as $user)
-        <tr class="border-b hover:bg-gray-100 transition">
-            <td class="p-3">{{ $user->id }}</td>
-            <td class="p-3">{{ $user->name }}</td>
-            <td class="p-3">{{ $user->email }}</td>
+        @if (isset($users))
+            @foreach ($users as $user)
+                <tr class="border-b hover:bg-gray-100 transition">
+                    <td class="p-3">{{ $user->id }}</td>
+                    <td class="p-3">{{ $user->name }}</td>
+                    <td class="p-3">{{ $user->email }}</td>
 
-            <!-- Empresas con estilos -->
-            <td class="p-3">
-                @if ($user->empresas->isNotEmpty())
-                @foreach ($user->empresas as $empresa)
-                <span class="px-2 py-1 text-sm font-semibold text-blue-700 bg-blue-200 rounded-lg">
-                    {{ $empresa->nombre_empresa }}
-                </span>
-                @endforeach
-                @else
-                <span class="px-2 py-1 text-sm text-gray-600 bg-gray-300 rounded-lg">Sin empresa</span>
-                @endif
-            </td>
+                    <!-- Empresas con estilos -->
+                    <td class="p-3">
+                        @if ($user->empresas->isNotEmpty())
+                            @foreach ($user->empresas as $empresa)
+                                <span class="px-2 py-1 text-sm font-semibold text-blue-700 bg-blue-200 rounded-lg">
+                                    {{ $empresa->nombre_empresa }}
+                                </span>
+                            @endforeach
+                        @else
+                            <span class="px-2 py-1 text-sm text-gray-600 bg-gray-300 rounded-lg">Sin empresa</span>
+                        @endif
+                    </td>
 
-            <!-- Roles con estilos -->
-            <td class="p-3">
-                @if ($user->roles->isNotEmpty())
-                @foreach ($user->roles as $rol)
-                <span class="px-2 py-1 text-sm font-semibold text-white 
-                                {{ $rol->name == 'Admin' ? 'bg-red-500' : 
-                                    ($rol->name == 'Técnico' ? 'bg-green-500' : 'bg-gray-500') }} 
+                    <!-- Roles con estilos -->
+                    <td class="p-3">
+                        @if ($user->roles->isNotEmpty())
+                            @foreach ($user->roles as $rol)
+                                <span
+                                    class="px-2 py-1 text-sm font-semibold text-white 
+                                {{ $rol->name == 'Admin' ? 'bg-red-500' : ($rol->name == 'Técnico' ? 'bg-green-500' : 'bg-gray-500') }} 
                                 rounded-lg">
-                    {{ $rol->name }}
-                </span>
-                @endforeach
-                @else
-                <span class="px-2 py-1 text-sm text-gray-600 bg-gray-300 rounded-lg">Sin rol</span>
-                @endif
-            </td>
+                                    {{ $rol->name }}
+                                </span>
+                            @endforeach
+                        @else
+                            <span class="px-2 py-1 text-sm text-gray-600 bg-gray-300 rounded-lg">Sin rol</span>
+                        @endif
+                    </td>
 
-            <td class="p-3 flex space-x-2">
-                <button class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">📝 Editar</button>
-                <form action="{{ route('dashboard.destroy', ['section' => 'usuarios', 'id' => $user->id]) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded">🗑️ Eliminar</button>
-                </form>
-            </td>
-        </tr>
-        @endforeach
+                    <td class="p-3 flex space-x-2">
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded" data-bs-toggle="modal"
+                            data-bs-target="#editEmpresaModal"      >📝 Editar</button>
+                        <form action="{{ route('dashboard.destroy', ['section' => 'usuarios', 'id' => $user->id]) }}"
+                            method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded">🗑️
+                                Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
         @else
-        <p>No hay usuarios disponibles</p>
+            <p>No hay usuarios disponibles</p>
         @endif
     </tbody>
 </table>
@@ -86,31 +90,35 @@
                     @csrf
                     <div class="mb-3">
                         <label for="name" class="form-label">Nombre</label>
-                        <input type="text" name="name" id="name" class="form-control" placeholder="Nombre del usuario" required>
+                        <input type="text" name="name" id="name" class="form-control"
+                            placeholder="Nombre del usuario" required>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" name="email" id="email" class="form-control" placeholder="Correo electrónico" required>
+                        <input type="email" name="email" id="email" class="form-control"
+                            placeholder="Correo electrónico" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" name="password" id="password" class="form-control" placeholder="Contraseña" required>
+                        <input type="password" name="password" id="password" class="form-control"
+                            placeholder="Contraseña" required>
                     </div>
                     <div class="mb-3">
                         <label for="password_confirmation" class="form-label">Confirmar Contraseña</label>
-                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Confirmar contraseña" required>
+                        <input type="password" name="password_confirmation" id="password_confirmation"
+                            class="form-control" placeholder="Confirmar contraseña" required>
                     </div>
                     <!-- Campo para seleccionar Empresa -->
                     <div class="mb-3">
                         <label for="empresa" class="form-label">Empresa</label>
                         <select name="empresa" id="empresa" class="form-control" required>
                             <option value="">Selecciona una empresa</option>
-                            @if(isset($empresas))
-                            @foreach ($empresas as $empresa)
-                            <option value="{{ $empresa->id }}">{{ $empresa->nombre_empresa }}</option>
-                            @endforeach
+                            @if (isset($empresas))
+                                @foreach ($empresas as $empresa)
+                                    <option value="{{ $empresa->id }}">{{ $empresa->nombre_empresa }}</option>
+                                @endforeach
                             @else
-                            <p>No hay empresas disponibles</p>
+                                <p>No hay empresas disponibles</p>
                             @endif
                         </select>
                     </div>
@@ -119,12 +127,12 @@
                         <label for="rol" class="form-label">Rol</label>
                         <select name="rol" id="rol" class="form-control" required>
                             <option value="">Selecciona un rol</option>
-                            @if(isset($roles))
-                            @foreach ($roles as $rol)
-                            <option value="{{ $rol->name }}">{{ $rol->name }}</option>
-                            @endforeach
+                            @if (isset($roles))
+                                @foreach ($roles as $rol)
+                                    <option value="{{ $rol->name }}">{{ $rol->name }}</option>
+                                @endforeach
                             @else
-                            <p>No hay roles disponibles</p>
+                                <p>No hay roles disponibles</p>
                             @endif
                         </select>
                     </div>

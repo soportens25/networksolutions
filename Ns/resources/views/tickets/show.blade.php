@@ -5,53 +5,67 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Detalle Ticket #{{ $ticket->id }}</title>
+
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link rel="icon" href="{{ asset('storage/image/logo.jpg') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
-<body class="bg-gradient-to-br from-indigo-50 via-white to-indigo-100 min-h-screen py-10">
+<body class="bg-gradient-to-br from-orange-50 via-white to-stone-100 min-h-screen py-10">
 
-    <div class="bg-indigo-600 text-white py-4 px-6 shadow-md rounded mx-4 md:mx-20 mb-6">
-        <h1 class="text-xl font-bold flex items-center gap-2">
-            <i class="ri-chat-3-line text-2xl"></i>
-            Detalle del Ticket #{{ $ticket->id }}
-        </h1>
+    <!-- Header -->
+    <div class="flex justify-between items-center mx-4 md:mx-20 mb-6">
+        <div class="bg-orange-500 text-white py-4 px-6 shadow-md rounded-lg">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <i class="ri-chat-3-line text-2xl"></i>
+                Detalle del Ticket #{{ $ticket->id }}
+            </h1>
+        </div>
+        <a href="{{ route('tickets.index') }}"
+            class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-700 transition">
+            ← Volver
+        </a>
     </div>
 
-    <div class="container mx-auto px-4 py-8">
-        <!-- Encabezado -->
-        <div class="bg-white p-6 rounded-2xl shadow-xl mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div><strong class="text-gray-700">Título:</strong> {{ $ticket->title }}</div>
-                <div><strong class="text-gray-700">Técnico:</strong> {{ $ticket->assignedUser->name ?? 'No asignado' }}
-                </div>
-                <div><strong class="text-gray-700">Estado:</strong>
-                    <span
-                        class="inline-block px-3 py-1 rounded-full text-xs font-semibold {{ $ticket->status == 'open' ? 'bg-green-200 text-green-800' : ($ticket->status == 'in_progress' ? 'bg-yellow-200 text-yellow-800' : ($ticket->status == 'resolved' ? 'bg-blue-200 text-blue-800' : 'bg-gray-200 text-gray-800')) }}">
+    <div class="container mx-auto px-4 py-8 space-y-8">
+        <!-- Detalles -->
+        <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">🎟 Información del Ticket</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                <div><strong>Título:</strong> {{ $ticket->title }}</div>
+                <div><strong>Técnico:</strong> {{ $ticket->assignedUser->name ?? 'No asignado' }}</div>
+                <div><strong>Estado:</strong>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold 
+                        {{ $ticket->status == 'open' ? 'bg-green-100 text-green-700' :
+                            ($ticket->status == 'in_progress' ? 'bg-yellow-100 text-yellow-700' :
+                            ($ticket->status == 'resolved' ? 'bg-blue-100 text-blue-700' :
+                            'bg-gray-200 text-gray-700')) }}">
                         {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
                     </span>
                 </div>
-                <div><strong class="text-gray-700">Descripción:</strong> {{ $ticket->description }}</div>
+                <div><strong>Descripción:</strong> {{ $ticket->description }}</div>
             </div>
         </div>
 
-        <!-- Chat en Tiempo Real -->
-        <div class="bg-white p-4 rounded-2xl shadow-xl">
+        <!-- Chat -->
+        <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-200">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-gray-800">💬 Chat en Tiempo Real</h3>
             </div>
 
             <!-- Mensajes -->
-            <div id="chat-box" class="h-96 overflow-y-auto space-y-4 bg-gray-50 p-4 rounded-lg">
+            <div id="chat-box" class="h-96 overflow-y-auto space-y-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
                 @foreach ($messages as $message)
                     <div id="msg-{{ $message->id }}"
                         class="flex {{ $message->user_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
                         <div
-                            class="max-w-xs px-4 py-2 rounded-lg shadow {{ $message->user_id === auth()->id() ? 'bg-indigo-600 text-white' : 'bg-white text-gray-800 border' }}">
+                            class="max-w-xs px-4 py-2 rounded-xl shadow-sm {{ $message->user_id === auth()->id() ? 'bg-orange-500 text-white' : 'bg-white text-gray-800 border border-gray-300' }}">
                             <p class="text-sm font-semibold mb-1">{{ $message->user->name }}</p>
                             <p class="text-sm">{{ $message->content }}</p>
-                            <div class="text-xs text-gray-300 mt-1">
+                            <div class="text-xs text-gray-400 mt-1">
                                 {{ $message->created_at->format('H:i') }}
                                 @if ($message->user_id === auth()->id())
                                     <span id="status-{{ $message->id }}">
@@ -74,10 +88,10 @@
                 <input type="hidden" id="ticket_id" value="{{ $ticket->id }}">
                 <input type="hidden" id="user_id" value="{{ auth()->id() }}">
                 <input type="text" id="message" placeholder="Escribe un mensaje..."
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg shadow focus:ring-2 focus:ring-indigo-400 outline-none"
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 outline-none"
                     autocomplete="off">
                 <button type="submit"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow transition">
+                    class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg shadow transition">
                     Enviar
                 </button>
             </form>
@@ -115,11 +129,10 @@
         });
 
         window.Pusher = Pusher;
-
         window.Echo = new Echo({
             broadcaster: 'pusher',
-            key: 'bd78fd19b532a3125db2', // Tu PUSHER_APP_KEY
-            cluster: 'us2', // Tu PUSHER_APP_CLUSTER
+            key: 'bd78fd19b532a3125db2',
+            cluster: 'us2',
             forceTLS: true,
             authEndpoint: '/Ns/Ns/public/broadcasting/auth',
             auth: {
@@ -129,7 +142,6 @@
             }
         });
 
-        // Suscribirse al canal privado del ticket
         const ticketChannel = window.Echo.private(`ticket.${ticketId}`);
 
         ticketChannel.listen('TicketMessageSent', (event) => {
@@ -140,10 +152,10 @@
                 div.id = 'msg-' + event.id;
                 div.className = 'flex ' + (isOwn ? 'justify-end' : 'justify-start');
                 div.innerHTML = `
-                    <div class="max-w-xs px-4 py-2 rounded-lg shadow ${isOwn ? 'bg-indigo-600 text-white' : 'bg-white text-gray-800 border'}">
+                    <div class="max-w-xs px-4 py-2 rounded-xl shadow-sm ${isOwn ? 'bg-orange-500 text-white' : 'bg-white text-gray-800 border border-gray-300'}">
                         <p class="text-sm font-semibold mb-1">${event.user.name}</p>
                         <p class="text-sm">${event.content}</p>
-                        <div class="text-xs text-gray-300 mt-1">
+                        <div class="text-xs text-gray-400 mt-1">
                             ${new Date(event.created_at).toLocaleTimeString()}
                             ${isOwn ? `<span id="status-${event.id}">✔ Enviado</span>` : ''}
                         </div>
@@ -166,7 +178,6 @@
             }
         });
 
-        // Indicador de "escribiendo..." usando whispers de Echo/Pusher
         let typingTimeout;
         messageInput.addEventListener('input', () => {
             ticketChannel.whisper('typing', {

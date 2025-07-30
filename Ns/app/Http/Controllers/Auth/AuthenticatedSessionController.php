@@ -30,7 +30,7 @@ class AuthenticatedSessionController extends Controller
     {
         // Validar reCAPTCHA
         $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-            'secret' => config('services.recaptcha.secret'),
+            'secret'   => config('services.recaptcha.secret'),
             'response' => $request->input('g-recaptcha-response'),
             'remoteip' => $request->ip(),
         ]);
@@ -55,7 +55,6 @@ class AuthenticatedSessionController extends Controller
 
         return redirect()->intended(RouteServiceProvider::HOME);
     }
-
 
     /**
      * Destroy an authenticated session.

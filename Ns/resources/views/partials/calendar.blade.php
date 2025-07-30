@@ -1,8 +1,11 @@
 <style>
     @keyframes highlightPulse {
-        0%, 100% {
+
+        0%,
+        100% {
             background-color: #fef3c7;
         }
+
         50% {
             background-color: #ff9361;
         }
@@ -19,10 +22,12 @@
 </style>
 
 <!-- Contenedor -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-8">
+<div class="1px-4 sm:px-6 lg:px-8 my-8" style="max-width: 100%;">
     <div class="bg-white rounded-2xl shadow-2xl border border-gray-300 overflow-hidden">
-        <h2 class="text-xl text-black font-semibold tracking-wide text-center py-4">📅 Calendario de Agendamientos</h2>
-        <div id="calendar" class="p-6 bg-gray-50"></div>
+        <h2 class="text-xl text-black font-semibold tracking-wide text-center py-4">
+            📅 Calendario de Agendamientos
+        </h2>
+        <div id="calendar" class="p-6 bg-gray-50 min-h-[600px]"></div>
     </div>
 </div>
 
@@ -82,8 +87,7 @@
         eventsUrl: '{{ url('api/events') }}'
     };
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const calendarEl = document.getElementById('calendar');
+    document.addEventListener('DOMContentLoaded', function() {
         const modal = document.getElementById('eventModal');
         const form = document.getElementById('eventForm');
         const titleInput = document.getElementById('eventTitle');
@@ -93,68 +97,94 @@
 
         const toDatetimeLocal = (str) => new Date(str).toISOString().slice(0, 16);
 
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            themeSystem: 'standard',
-            initialView: 'dayGridMonth',
-            locale: 'es',
-            firstDay: 1,
-            height: 'auto',
-            selectable: true,
-            nowIndicator: true,
-            dayMaxEvents: true,
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-            },
-            events: window.Laravel.eventsUrl,
-            eventClassNames: function (arg) {
-                return [
-                    'rounded-md', 'text-white', 'px-2', 'py-1', 'text-sm',
-                    arg.event.extendedProps.type === 'tarea' ? 'bg-blue-500' : 'bg-green-500'
-                ];
-            },
-            eventContent: function(arg) {
-                const title = arg.event.title;
-                const type = arg.event.extendedProps.type === 'tarea' ? '📝 Tarea' : '📌 Evento';
-                const time = arg.timeText;
+        // Configuración común de calendario
+        function crearCalendario(selectorId) {
+            const el = document.getElementById(selectorId);
 
-                return {
-                    html: `
-                        <div class="text-sm leading-snug">
-                            <div class="font-semibold">${title}</div>
-                            <div class="text-xs opacity-90">${type}</div>
-                            <div class="text-xs">${time}</div>
-                        </div>
-                    `
-                };
-            },
-            eventDidMount: function (info) {
-                const type = info.event.extendedProps.type === 'tarea' ? 'Tarea' : 'Evento';
-                const start = info.event.start.toLocaleString();
-                const end = info.event.end ? info.event.end.toLocaleString() : '';
+            return new FullCalendar.Calendar(el, {
+                themeSystem: 'standard',
+                initialView: 'dayGridMonth',
+                locale: 'es',
+                firstDay: 1,
+                height: 'auto',
+                selectable: true,
+                nowIndicator: true,
+                dayMaxEvents: true,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                },
+                events: window.Laravel.eventsUrl,
+                eventClassNames: function(arg) {
+                    return [
+                        'rounded-md', 'text-white', 'px-2', 'py-1', 'text-sm',
+                        arg.event.extendedProps.type === 'tarea' ? 'bg-blue-500' :
+                        'bg-green-500'
+                    ];
+                },
+                eventContent: function(arg) {
+                    const title = arg.event.title;
+                    const type = arg.event.extendedProps.type === 'tarea' ? '📝 Tarea' :
+                        '📌 Evento';
+                    const time = arg.timeText;
 
-                tippy(info.el, {
-                    content: `
-                        <strong>${info.event.title}</strong><br>
-                        Tipo: ${type}<br>
-                        Inicio: ${start}<br>
-                        ${end ? `Fin: ${end}<br>` : ''}
-                    `,
-                    allowHTML: true,
-                    theme: 'light-border',
-                });
-            },
-            select: function (info) {
-                startInput.value = toDatetimeLocal(info.startStr);
-                endInput.value = toDatetimeLocal(info.endStr);
-                openModal();
-            }
-        });
+                    return {
+                        html: `
+                            <div class="text-sm leading-snug">
+                                <div class="font-semibold">${title}</div>
+                                <div class="text-xs opacity-90">${type}</div>
+                                <div class="text-xs">${time}</div>
+                            </div>
+                        `
+                    };
+                },
+                eventDidMount: function(info) {
+                    const type = info.event.extendedProps.type === 'tarea' ? 'Tarea' : 'Evento';
+                    const start = info.event.start.toLocaleString();
+                    const end = info.event.end ? info.event.end.toLocaleString() : '';
 
-        calendar.render();
+                    tippy(info.el, {
+                        content: `
+                            <strong>${info.event.title}</strong><br>
+                            Tipo: ${type}<br>
+                            Inicio: ${start}<br>
+                            ${end ? `Fin: ${end}<br>` : ''}
+                        `,
+                        allowHTML: true,
+                        theme: 'light-border',
+                    });
+                },
+                select: function(info) {
+                    startInput.value = toDatetimeLocal(info.startStr);
+                    endInput.value = toDatetimeLocal(info.endStr);
+                    openModal();
+                }
+            });
+        }
 
-        form.addEventListener('submit', function (e) {
+        // Instanciar ambos calendarios
+        const calendarA = crearCalendario('calendar');
+        const calendarB = crearCalendario('calendar1');
+
+        function renderWhenVisible(calendar, containerId) {
+            const el = document.getElementById(containerId);
+            const waitForVisibility = () => {
+                const isVisible = el.offsetParent !== null && el.offsetHeight > 0;
+                if (isVisible) {
+                    calendar.render();
+                } else {
+                    requestAnimationFrame(waitForVisibility);
+                }
+            };
+            waitForVisibility();
+        }
+
+        renderWhenVisible(calendarA, 'calendar');
+        renderWhenVisible(calendarB, 'calendar1');
+
+        // Crear evento desde formulario
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
             const title = titleInput.value.trim();
             const type = typeSelect.value;
@@ -169,14 +199,24 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': window.Laravel.csrfToken
                 },
-                body: JSON.stringify({ title, type, start, end })
+                body: JSON.stringify({
+                    title,
+                    type,
+                    start,
+                    end
+                })
             }).then(() => {
-                calendar.refetchEvents();
+                calendarA.refetchEvents();
+                calendarB.refetchEvents();
                 closeModal();
                 form.reset();
+            }).catch(err => {
+                console.error('Error al guardar el evento:', err);
+                alert('Error al crear el evento.');
             });
         });
 
+        // Cierre del modal
         window.addEventListener('keydown', e => {
             if (e.key === 'Escape') closeModal();
         });

@@ -8,11 +8,16 @@
 
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous">
+    </script>
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <!-- jQuery -->
@@ -24,12 +29,15 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <!-- Head -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light-border.css" />   
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales-all.global.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js"></script>
+
     <link rel="icon" href="{{ asset('storage/image/logo.jpg') }}">
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
         @keyframes fade-in {
@@ -47,92 +55,91 @@
         .animate-fade-in {
             animation: fade-in 0.5s ease-out;
         }
+
+        a {
+            text-decoration: none;
+        }
     </style>
 
     @stack('styles')
 </head>
 
-<body class="font-sans bg-gray-100">
+<body class="bg-gray-100 font-sans">
     <div class="flex h-screen">
         <!-- Sidebar -->
-        <aside class="w-64 bg-gray-900 text-white flex flex-col">
-            <div class="flex items-center justify-center h-20 border-b border-gray-700">
-                <img src="{{ asset('storage/image/icono_ns.png') }}" alt="Logo" class="w-20 h-20">
+        <aside id="sidebar"
+            class="w-64 transition-all duration-300 bg-gradient-to-b from-gray-900 via-gray-800 to-orange-600 text-white flex flex-col shadow-xl rounded-r-xl overflow-hidden">
+            <div class="flex items-center justify-between py-4 px-4">
+                <img src="{{ asset('storage/image/ns.png') }}" alt="Logo" class="h-12">
+                <button id="toggleSidebar" class="text-white focus:outline-none">
+                    <i class="ri-arrow-left-s-line text-2xl"></i>
+                </button>
             </div>
-            <nav class="flex-1 px-4 py-6">
-                <ul class="space-y-4">
+            <nav class="flex-1 px-2 py-4">
+                <ul class="space-y-2">
                     @role('empresarial')
                         <li>
                             <a href="#"
-                                class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                                class="flex items-center gap-3 text-gray-300 hover:text-white hover:bg-orange-600 px-3 py-2 rounded-md"
                                 data-target="inventario">
-                                <i class="ri-archive-line text-xl"></i>
-                                <span>Inventario</span>
+                                <i class="ri-archive-line text-xl"></i><span class="sidebar-label">Inventario</span>
                             </a>
                         </li>
                         <li>
                             <a href="#"
-                                class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                                class="flex items-center gap-3 text-gray-300 hover:text-white hover:bg-orange-600 px-3 py-2 rounded-md"
                                 data-target="docs">
-                                <i class="ri-docs-todo-line"></i>
-                                <span>docs</span>
+                                <i class="ri-docs-todo-line text-xl"></i><span class="sidebar-label">Docs</span>
                             </a>
                         </li>
                     @else
                         <li>
                             <a href="#"
-                                class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                                class="flex items-center gap-3 text-gray-300 hover:text-white hover:bg-orange-600 px-3 py-2 rounded-md"
                                 data-target="dashboard">
-                                <i class="ri-dashboard-line text-xl"></i>
-                                <span>Dashboard</span>
+                                <i class="ri-dashboard-line text-xl"></i><span class="sidebar-label">Dashboard</span>
                             </a>
                         </li>
                         <li>
                             <a href="#"
-                                class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                                class="flex items-center gap-3 text-gray-300 hover:text-white hover:bg-orange-600 px-3 py-2 rounded-md"
                                 data-target="tienda">
-                                <i class="ri-store-2-line text-xl"></i>
-                                <span>Tienda</span>
+                                <i class="ri-store-2-line text-xl"></i><span class="sidebar-label">Tienda</span>
                             </a>
                         </li>
                         <li>
                             <a href="#"
-                                class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                                class="flex items-center gap-3 text-gray-300 hover:text-white hover:bg-orange-600 px-3 py-2 rounded-md"
                                 data-target="usuarios">
-                                <i class="ri-user-3-line text-xl"></i>
-                                <span>Usuarios</span>
+                                <i class="ri-user-3-line text-xl"></i><span class="sidebar-label">Usuarios</span>
                             </a>
                         </li>
                         <li>
                             <a href="#"
-                                class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                                class="flex items-center gap-3 text-gray-300 hover:text-white hover:bg-orange-600 px-3 py-2 rounded-md"
                                 data-target="empresas">
-                                <i class="ri-building-line text-xl"></i>
-                                <span>Empresas</span>
+                                <i class="ri-building-line text-xl"></i><span class="sidebar-label">Empresas</span>
                             </a>
                         </li>
                         <li>
                             <a href="#"
-                                class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                                class="flex items-center gap-3 text-gray-300 hover:text-white hover:bg-orange-600 px-3 py-2 rounded-md"
                                 data-target="inventario">
-                                <i class="ri-archive-line text-xl"></i>
-                                <span>Inventario</span>
+                                <i class="ri-archive-line text-xl"></i><span class="sidebar-label">Inventario</span>
                             </a>
                         </li>
                         <li>
                             <a href="#"
-                                class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                                class="flex items-center gap-3 text-gray-300 hover:text-white hover:bg-orange-600 px-3 py-2 rounded-md"
                                 data-target="calendario">
-                                <i class="ri-calendar-event-line"></i>
-                                <span>Calendario</span>
+                                <i class="ri-calendar-event-line text-xl"></i><span class="sidebar-label">Calendario</span>
                             </a>
                         </li>
                         <li>
                             <a href="#"
-                                class="flex items-center space-x-3 text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-md"
+                                class="flex items-center gap-3 text-gray-300 hover:text-white hover:bg-orange-600 px-3 py-2 rounded-md"
                                 data-target="docs">
-                                <i class="ri-article-line"></i>
-                                <span>Documentos</span>
+                                <i class="ri-article-line text-xl"></i><span class="sidebar-label">Documentos</span>
                             </a>
                         </li>
                     @endrole
@@ -141,98 +148,81 @@
         </aside>
 
         <!-- Contenido Principal -->
-        <main class="border shadow-xl rounded-xl m-4 md:m-12 flex-1 flex flex-col overflow-hidden">
+        <main class="flex-1 flex flex-col m-4 md:m-6 rounded-xl shadow-xl bg-white overflow-hidden">
             <!-- Barra Superior -->
-            <header class="flex items-center justify-between bg-white h-16 px-6 border-b border-gray-200">
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-800">@yield('title', 'Panel de Control')</h2>
-                </div>
+            <header class="flex justify-between items-center h-16 px-6 border-b border-gray-200 bg-white">
+                <h2 class="text-xl font-semibold text-gray-800">@yield('title', 'Panel de Control')</h2>
                 <div class="relative">
-                    <button id="user-menu-toggle" class="flex items-center focus:outline-none">
+                    <button id="user-menu-toggle" class="focus:outline-none">
                         <i class="ri-user-line text-2xl text-gray-600"></i>
                     </button>
                     <div id="user-menu"
                         class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg hidden">
                         <ul>
-                            <li>
-                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Perfil</a>
+                            <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Perfil</a>
                             </li>
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Configuraciones</a>
-                            </li>
-                            <li>
-                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Cerrar
-                                    sesión</a>
-                            </li>
+                            <li><a href="#"
+                                    class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Configuraciones</a></li>
+                            <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Cerrar
+                                    sesión</a></li>
                         </ul>
                     </div>
                 </div>
             </header>
 
-            <!-- Banner del apartado -->
             @hasSection('apartado')
                 <div
-                    class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-5 px-8 shadow-lg rounded-xl mx-4 md:mx-20 mt-6 mb-6 animate-fade-in">
-                    <h1 class="text-2xl md:text-3xl font-bold flex items-center gap-3">
-                        @yield('apartado')
-                    </h1>
+                    class="bg-gradient-to-r from-indigo-500 to-orange-500 text-white py-4 px-6 md:px-12 rounded-xl shadow-md mx-4 mt-6 animate-fade-in">
+                    <h1 class="text-2xl md:text-3xl font-bold">@yield('apartado')</h1>
                 </div>
             @endif
 
-            <!-- Contenido principal -->
-            <div class="flex-1 p-6 bg-gray-50 overflow-y-auto">
+            <div class="flex-1 p-6 overflow-y-auto bg-gray-50">
                 @yield('content')
             </div>
         </main>
     </div>
 
-    <!-- Scripts -->
-    @stack('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
+    <!-- JS -->
+    <script src="https://unpkg.com/tabulator-tables@5.4.3/dist/js/tabulator.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const seccion = urlParams.get('seccion');
-
+            const seccion = new URLSearchParams(window.location.search).get('seccion');
             if (seccion) {
-                document.querySelectorAll('.content-section').forEach(function(section) {
-                    section.classList.add('hidden');
-                });
-
-                const targetSection = document.getElementById(seccion);
-                if (targetSection) {
-                    targetSection.classList.remove('hidden');
-                }
+                document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+                const target = document.getElementById(seccion);
+                if (target) target.classList.remove('hidden');
             }
-
-            document.querySelectorAll('a[data-target]').forEach(function(link) {
-                link.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    const target = this.getAttribute('data-target');
-
-                    document.querySelectorAll('.content-section').forEach(function(section) {
-                        section.classList.add('hidden');
-                    });
-
+            document.querySelectorAll('a[data-target]').forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    const target = link.getAttribute('data-target');
+                    document.querySelectorAll('.content-section').forEach(el => el.classList.add(
+                        'hidden'));
                     document.getElementById(target).classList.remove('hidden');
-
-                    const newUrl = `${window.location.pathname}?seccion=${target}`;
-                    window.history.pushState({}, '', newUrl);
+                    history.pushState({}, '', `${window.location.pathname}?seccion=${target}`);
                 });
             });
+            document.getElementById('user-menu-toggle').addEventListener('click', () => {
+                document.getElementById('user-menu').classList.toggle('hidden');
+            });
 
-            const userToggle = document.getElementById('user-menu-toggle');
-            const userMenu = document.getElementById('user-menu');
-
-            userToggle.addEventListener('click', () => {
-                userMenu.classList.toggle('hidden');
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const sidebar = document.getElementById('sidebar');
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('w-64');
+                sidebar.classList.toggle('w-20');
+                document.querySelectorAll('.sidebar-label').forEach(label => label.classList.toggle(
+                    'hidden'));
+                toggleBtn.querySelector('i').classList.toggle('ri-arrow-left-s-line');
+                toggleBtn.querySelector('i').classList.toggle('ri-arrow-right-s-line');
             });
         });
     </script>
+    @stack('scripts')
 </body>
 
 </html>

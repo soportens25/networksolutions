@@ -140,7 +140,7 @@
             <table class="header-table">
                 <tr>
                     <td class="logo-container">
-                        <img src="{{ asset('storage/' . $logo) }}" class="logo">
+                        <img src="file://{{ $logoPath }}" class="logo">
                     </td>
                     <td class="title-container">
                         <h1>HOJA DE VIDA DE EQUIPOS DE CÓMPUTO</h1>
@@ -149,7 +149,7 @@
                             No.: 1</p>
                     </td>
                     <td class="logo-container">
-                        <img src="{{ asset('storage/image/logo.jpg') }}" class="logo">
+                        <img src="file://{{ $logoNet }}" class="logo">
                     </td>
                 </tr>
             </table>
@@ -262,7 +262,7 @@
             <br>
             <br>
             <br>
-            <br>    
+            <br>
             <br>
             <div class="section">
                 <div class="section-title">4. DETALLES ADICIONALES</div>
