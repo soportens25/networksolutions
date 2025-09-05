@@ -8,7 +8,8 @@ use App\Http\Controllers\{
     TicketViewController,
     TicketController,
     MessageController,
-    TechnicianStatusController
+    TechnicianStatusController,
+    ChatController
 };
 use Illuminate\Support\Facades\Route;
 use BeyondCode\LaravelWebSockets\Facades\WebSocketsRouter;
@@ -51,9 +52,6 @@ Route::middleware(['auth', 'role:admin|empresarial|tecnico'])->prefix('dashboard
     Route::post('/events', [DashboardController::class, 'store_calendar']);
 });
 
-// Solo define el resource una vez, fuera del grupo de middleware
-Route::resource('tickets', TicketController::class);
-
 // Rutas adicionales protegidas por auth
 Route::middleware(['auth'])->group(function () {
     // Si necesitas rutas adicionales para tickets, usa nombres diferentes o elimina estas si no son necesarias.
@@ -67,5 +65,60 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/technician/status', [TicketController::class, 'updateTechnicianStatus'])->name('technician.status.updateTechnician');
     Route::post('/tickets/{id}/self-assign', [TicketController::class, 'selfAssign'])->name('tickets.selfAssign');
 });
+
+
+Route::middleware(['auth'])->group(function () {
+    // Rutas principales de tickets
+    Route::resource('tickets', TicketController::class);
+    
+    // Rutas específicas
+    Route::post('/technician/status', [TicketController::class, 'updateTechnicianStatus'])->name('technician.status.update');
+    Route::post('/tickets/{ticket}/self-assign', [TicketController::class, 'selfAssign'])->name('tickets.selfAssign');
+    Route::post('/tickets/{ticket}/assign', [TicketController::class, 'assignTicket'])->name('tickets.assign')->middleware('role:admin');
+    
+    // Mensajes
+    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('tickets', TicketController::class);
+    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+    Route::post('/messages/read', [MessageController::class, 'markAsRead'])->name('messages.read');
+    
+    // Ruta de testing (eliminar en producción)
+    Route::get('/test-broadcast', function() {
+        $message = \App\Models\Message::with('user')->first();
+        if ($message) {
+            broadcast(new \App\Events\TicketMessageSent($message));
+            return 'Broadcast enviado - revisa la consola';
+        }
+        return 'No hay mensajes para probar';
+    });
+});
+
+Route::middleware(['auth'])->group(function () {
+    // Rutas del chat
+    Route::prefix('chat')->group(function () {
+        Route::post('/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+        Route::get('/messages/{ticket}', [ChatController::class, 'getMessages'])->name('chat.messages');
+        Route::post('/read', [ChatController::class, 'markAsRead'])->name('chat.read');
+    });
+    
+    // Otras rutas
+    Route::resource('tickets', TicketController::class);
+});
+
+Route::get('/debug-auth', function() {
+    return [
+        'authenticated' => auth()->check(),
+        'user_id' => auth()->id(),
+        'user_name' => auth()->user()?->name,
+        'guard' => config('auth.defaults.guard'),
+        'session_driver' => config('session.driver')
+    ];
+})->middleware('web');
+
+Broadcast::routes(['middleware' => ['auth']]);
+
 
 require __DIR__ . '/auth.php';

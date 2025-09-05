@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreMessageRequest extends FormRequest
+{
+    public function authorize()
+    {
+        // Verificar que el usuario tenga acceso al ticket
+        $ticket = \App\Models\Ticket::find($this->ticket_id);
+        return $ticket && (
+            $ticket->user_id === auth()->id() || 
+            $ticket->technician_id === auth()->id() ||
+            auth()->user()->hasRole(['admin', 'supervisor'])
+        );
+    }
+
+    public function rules()
+    {
+        return [
+            'ticket_id' => 'required|exists:tickets,id',
+            'content' => 'required|string|max:1000|min:3',
+            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120', // 5MB
+        ];
+    }
+}

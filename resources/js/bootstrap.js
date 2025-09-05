@@ -1,67 +1,48 @@
+import axios from 'axios';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 
+// Configurar Axios globalmente
+window.axios = axios;
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+// Configurar token CSRF
+let token = document.head.querySelector('meta[name="csrf-token"]');
+if (token) {
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+} else {
+    console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+}
+
+// Configurar Pusher y Laravel Echo
 window.Pusher = Pusher;
 
 window.Echo = new Echo({
     broadcaster: 'pusher',
-    key: 'bd78fd19b532a3125db2', // Tu PUSHER_APP_KEY
-    cluster: 'us2',             // Tu PUSHER_APP_CLUSTER
+    key: process.env.MIX_PUSHER_APP_KEY || 'bd78fd19b532a3125db2',
+    cluster: process.env.MIX_PUSHER_APP_CLUSTER || 'us2',
     forceTLS: true,
-    // Si tu app está en /Ns/Ns/public, agrega el endpoint:
-    authEndpoint: '/Ns/Ns/public/broadcasting/auth',
+    namespace: '', // ⭐ IMPORTANTE: Namespace vacío
+    authEndpoint: '/broadcasting/auth',
     auth: {
         headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            'X-CSRF-TOKEN': token ? token.content : '',
+            'X-Requested-With': 'XMLHttpRequest'
         }
     }
 });
 
-
-// Para depuración, muestra eventos de conexión
-window.Echo.connector.pusher.connection.bind('connected', () => {
-    console.log('Conexión WebSocket establecida.');
-});
-window.Echo.connector.pusher.connection.bind('disconnected', () => {
-    console.warn('Conexión WebSocket desconectada. Se intentará reconectar...');
-});
-window.Echo.connector.pusher.connection.bind('error', (err) => {
-    console.error('Error en la conexión WebSocket:', err);
-});
-
-// Suscribirse al canal del ticket y escuchar el evento 'MessageSent'
-const ticketChannel = window.Echo.private(`ticket.${ticketId}`)
-    .listen('TicketMessageSent', (event) => {
-        console.log('Nuevo mensaje recibido:', event);
-        // Actualiza el DOM según tus necesidades, por ejemplo:
-        const chatBox = document.getElementById('chat-box');
-        if (!document.getElementById('msg-' + event.id)) {
-            let newMessage = document.createElement('div');
-            newMessage.id = 'msg-' + event.id;
-            newMessage.innerHTML = `<strong>${event.user}:</strong> ${event.content} <small>${event.created_at}</small>`;
-            chatBox.appendChild(newMessage);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+// Debug de conexión (opcional - solo para desarrollo)
+if (process.env.NODE_ENV === 'development') {
+    window.Echo.connector.pusher.connection.bind('connected', () => {
+        console.log('✅ Laravel Echo conectado exitosamente');
     });
 
-let typingTimeout;
-messageInput.addEventListener('input', () => {
-    axios.post('/api/typing', {
-        ticket_id: ticketId
+    window.Echo.connector.pusher.connection.bind('disconnected', () => {
+        console.warn('❌ Laravel Echo desconectado');
     });
 
-    clearTimeout(typingTimeout);
-    typingTimeout = setTimeout(() => {
-        // Podrías emitir un evento para "dejó de escribir"
-    }, 3000);
-});
-
-if (document.hidden) {
-    if (Notification.permission === "granted") {
-        new Notification("Nuevo mensaje", {
-            body: `${event.user.name}: ${event.content}`
-        });
-    } else if (Notification.permission !== "denied") {
-        Notification.requestPermission();
-    }
+    window.Echo.connector.pusher.connection.bind('error', (error) => {
+        console.error('❌ Error en Laravel Echo:', error);
+    });
 }
