@@ -19,40 +19,45 @@ class TicketController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $query = Ticket::with('assignedUser', 'user');
+        $ticketsQuery = Ticket::with(['user', 'assignedUser', 'empresa']);
 
-        // Aplicar filtros por rol - CORREGIDO
-        if ($user->hasRole('tecnico')) {
-            $query->where(function ($q) use ($user) {
-                $q->whereNull('technician_id')
-                    ->orWhere('technician_id', $user->id);
-            });
-        } elseif ($user->hasRole('empresarial')) {
-            $empresaIds = $user->empresas()->pluck('empresas.id')->toArray();
-            $query->whereHas('user.empresas', function ($q) use ($empresaIds) {
-                $q->whereIn('empresas.id', $empresaIds);
+        if ($user->hasAnyRole(['admin', 'tecnico'])) {
+            // Admin y técnico ven TODOS los tickets
+            $tickets = $ticketsQuery;
+        } else {
+            // Usuarios empresariales solo ven tickets de sus empresas
+            $empresaIds = $user->empresas->pluck('id')->toArray();
+            $tickets = $ticketsQuery->whereIn('empresa_id', $empresaIds);
+        }
+
+        // Aplicar filtros adicionales si existen
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $tickets->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('id', 'like', "%{$search}%");
             });
         }
-        // Los admin ven todos los tickets (sin filtro adicional)
 
         // Filtros opcionales
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $ticketsQuery->where('status', $request->status);
         }
 
         if ($request->filled('technician_id')) {
-            $query->where('technician_id', $request->technician_id);
+            $ticketsQuery->where('technician_id', $request->technician_id);
         }
 
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
+            $ticketsQuery->where(function ($q) use ($request) {
                 $q->where('title', 'like', '%' . $request->search . '%')
                     ->orWhere('description', 'like', '%' . $request->search . '%')
                     ->orWhere('id', 'like', '%' . $request->search . '%');
             });
         }
 
-        $tickets = $query->paginate(15);
+        $tickets = $ticketsQuery->paginate(15);
 
         // CORREGIDO: Buscar técnicos correctamente
         try {
@@ -105,22 +110,42 @@ class TicketController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        // ⭐ VALIDACIÓN ACTUALIZADA
+        $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+            'empresa_id' => 'nullable|exists:empresas,id', // Opcional para admin/técnico
         ]);
 
         try {
+            $user = Auth::user();
             $technicianStatus = TechnicianStatus::where('status', 'available')->first();
             $status = $technicianStatus ? 'assigned' : 'pending';
 
-            // Datos básicos del ticket
+            // ⭐ LÓGICA PARA ASIGNAR EMPRESA
+            $empresaId = null;
+
+            if ($user->hasAnyRole(['admin', 'tecnico'])) {
+                // Admin/Técnico pueden especificar empresa o dejarla vacía
+                $empresaId = $request->empresa_id;
+            } else {
+                // Usuarios empresariales: usar su primera empresa automáticamente
+                $empresaId = $user->empresas->first()?->id;
+
+                if (!$empresaId) {
+                    return back()->withInput()
+                        ->withErrors(['error' => 'No tienes una empresa asignada. Contacta al administrador.']);
+                }
+            }
+
+            // ⭐ DATOS DEL TICKET CON EMPRESA
             $ticketData = [
-                'user_id' => Auth::id(),
+                'user_id' => $user->id,
                 'technician_id' => $technicianStatus?->user_id,
-                'title' => $request->title,
-                'description' => $request->description,
+                'title' => $validatedData['title'],
+                'description' => $validatedData['description'],
                 'status' => $status,
+                'empresa_id' => $empresaId, // ⭐ EMPRESA ASIGNADA
             ];
 
             // Crear ticket
@@ -131,7 +156,7 @@ class TicketController extends Controller
                 $technicianStatus->update(['status' => 'busy']);
             }
 
-            // ENVIAR NOTIFICACIONES
+            // Enviar notificaciones
             try {
                 $this->sendTicketCreatedNotifications($ticket);
             } catch (\Exception $e) {
@@ -247,15 +272,15 @@ class TicketController extends Controller
 
                 // **ENVIAR NOTIFICACIONES DE CAMBIO DE ESTADO - MEJORADO**
                 Log::info('Iniciando envío de notificaciones de cambio de estado...');
-                
+
                 try {
                     // Notificar al creador del ticket
                     if ($ticket->user && $ticket->user->email && $ticket->user->id !== Auth::id()) {
                         Log::info('Enviando notificación al creador:', [
-                            'user_id' => $ticket->user->id, 
+                            'user_id' => $ticket->user->id,
                             'email' => $ticket->user->email
                         ]);
-                        
+
                         $ticket->user->notify(new TicketStatusChanged($ticket, $oldStatus, $newStatus));
                         Log::info('✅ Notificación al creador enviada exitosamente');
                     } else {
@@ -269,10 +294,10 @@ class TicketController extends Controller
                     // Notificar al técnico asignado
                     if ($ticket->assignedUser && $ticket->assignedUser->email && $ticket->assignedUser->id !== Auth::id()) {
                         Log::info('Enviando notificación al técnico:', [
-                            'user_id' => $ticket->assignedUser->id, 
+                            'user_id' => $ticket->assignedUser->id,
                             'email' => $ticket->assignedUser->email
                         ]);
-                        
+
                         $ticket->assignedUser->notify(new TicketStatusChanged($ticket, $oldStatus, $newStatus));
                         Log::info('✅ Notificación al técnico enviada exitosamente');
                     } else {
@@ -290,7 +315,6 @@ class TicketController extends Controller
                         $testUser->notify(new TicketStatusChanged($ticket, $oldStatus, $newStatus));
                         Log::info('✅ Notificación FORZADA enviada a: ' . $testUser->email);
                     }
-
                 } catch (\Exception $e) {
                     Log::error('❌ Error enviando notificaciones de cambio de estado:', [
                         'error' => $e->getMessage(),

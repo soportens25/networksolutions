@@ -138,7 +138,6 @@ class DashboardController extends Controller
             return redirect()->route('dashboard')->with('error', 'Ocurrió un error al guardar los datos.');
         }
     }
-
     public function update(Request $request, $section, $id)
     {
         try {
@@ -150,12 +149,36 @@ class DashboardController extends Controller
             $item = $model::findOrFail($id);
             $validatedData = $this->validateData($request, $section, $id);
 
-            // Guardar imágenes si existen
-            $validatedData = $this->handleImages($request, $validatedData, $section, $item);
+            if ($section === 'usuarios') {
+                // ⭐ ACTUALIZAR DATOS BÁSICOS DEL USUARIO
+                $item->update($validatedData);
 
-            $item->update($validatedData);
+                // ⭐ MANEJAR EMPRESA Y ROL
+                $empresaId = $request->input('empresa');
+                $rolName = $request->input('rol');
 
-            return redirect()->route('dashboard')->with('success', ucfirst($section) . ' actualizado con éxito.');
+                if ($empresaId && $rolName) {
+                    $empresa = Empresa::findOrFail($empresaId);
+                    $rol = \Spatie\Permission\Models\Role::where('name', $rolName)->firstOrFail();
+
+                    // ⭐ USAR SYNC() PARA REEMPLAZAR LA EMPRESA ANTERIOR
+                    // sync() reemplaza completamente las relaciones existentes
+                    $item->empresas()->sync([
+                        $empresaId => ['role_id' => $rol->id]
+                    ]);
+
+                    // ⭐ SINCRONIZAR ROLES DE SPATIE
+                    $item->syncRoles([$rolName]);
+                }
+
+                return redirect()->route('dashboard')->with('success', 'Usuario actualizado correctamente.');
+            } else {
+                // ⭐ PARA OTRAS SECCIONES (NO USUARIOS)
+                $validatedData = $this->handleImages($request, $validatedData, $section, $item);
+                $item->update($validatedData);
+
+                return redirect()->route('dashboard')->with('success', ucfirst($section) . ' actualizado con éxito.');
+            }
         } catch (\Exception $e) {
             Log::error("Error al actualizar $section con ID $id: " . $e->getMessage());
             return redirect()->route('dashboard')->with('error', 'Ocurrió un error al actualizar.');

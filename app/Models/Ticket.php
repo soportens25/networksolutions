@@ -22,8 +22,14 @@ class Ticket extends Model
         'assigned_at',
         'resolved_at',
         'last_viewed_by_technician',
-        'metadata'
+        'metadata',
+        'empresa_id'
     ];
+
+        public function empresa()
+    {
+        return $this->belongsTo(Empresa::class, 'empresa_id');
+    }
 
     protected $casts = [
         'assigned_at' => 'datetime',
